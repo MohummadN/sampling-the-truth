@@ -1,10 +1,2 @@
-torch
-transformers
-huggingface_hub
-datasets
-sentence-transformers
-nltk
-numpy
-matplotlib
-pyyaml
-pytest
+huggingface_hub==1.29.0
+PyYAML==6.0.3
