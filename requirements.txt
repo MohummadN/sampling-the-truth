@@ -1,0 +1,10 @@
+torch
+transformers
+huggingface_hub
+datasets
+sentence-transformers
+nltk
+numpy
+matplotlib
+pyyaml
+pytest
