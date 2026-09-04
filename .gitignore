@@ -1,0 +1,7 @@
+outputs/
+figures/
+logs/
+data/reference_pages.json
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
