@@ -19,6 +19,16 @@ This file becomes the paper's Experimental Setup section.
             finish in available queue time. Identical across arms — fairness of
             the comparison depends on it.
 
+2026-09-05  All decoding arms explicitly set do_sample, temperature, top_p,
+            and top_k. GPT-2 and Llama ship different generation defaults, so
+            inherited values would make the arms non-comparable across models.
+
+2026-09-05  Pinned transformers==5.16.1 because generation defaults and DoLa
+            behavior differ across major Transformers versions.
+
+2026-09-05  max_new_tokens=256 for every arm: long enough for biography
+            generation while keeping the full grid computationally feasible.
+
 ## Still open
 - Scorer model for perplexity (must not be one of the 3 generators)
 - Entailment threshold theta          (tune on dev only)

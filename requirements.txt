@@ -1,5 +1,5 @@
 torch
-transformers
+transformers 
 huggingface_hub
 datasets
 sentence-transformers
