@@ -1,3 +1,12 @@
+"""Decoding arms for the factuality-diversity grid.
+
+Single source of truth mapping arm name -> generate() kwargs.
+Every arm shares max_new_tokens=256; sampling arms set top_k=0
+explicitly because HF defaults to top_k=50. Deterministic arms
+carry explicit sampling fields (unused, triggers a harmless HF
+warning) so nothing inherits from a model's generation_config.
+"""
+
 from transformers import GenerationConfig
 
 
@@ -117,7 +126,8 @@ def describe(model, arm: str) -> dict[str, object]:
     cfg.update(**kwargs_for(arm))
 
     return {
-        field: getattr(cfg, field)
+        # Default None: dola_layers is absent on older transformers.
+        field: getattr(cfg, field, None)
         for field in DESCRIBE_FIELDS
     }
 

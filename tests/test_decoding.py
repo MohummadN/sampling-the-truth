@@ -37,3 +37,9 @@ def test_kwargs_for_returns_a_copy() -> None:
 def test_unknown_arm_raises_clear_error() -> None:
     with pytest.raises(KeyError, match="Unknown decoding arm"):
         kwargs_for("wrong")
+
+def test_sampling_arms_disable_top_k() -> None:
+    for arm in ARMS:
+        kwargs = kwargs_for(arm)
+        if kwargs["do_sample"]:
+            assert kwargs["top_k"] == 0, f"{arm}: top_k must be 0, got {kwargs['top_k']}"
