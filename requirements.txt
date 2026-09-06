@@ -1,18 +1,24 @@
-# torch cu126 needs: pip install --index-url https://download.pytorch.org/whl/cu126 torch==2.14.0+cu126
-torch==2.14.0+cu126
-transformers==5.16.1
-tokenizers==0.23.2
+# NLP Final Project — pinned environment.
+#
+# Install torch FIRST, from the cu126 index. The cluster's GPUs are TITAN Xp
+# (sm_61); the default cu130 wheel has no Pascal kernels and silently runs on CPU:
+#
+#   pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cu126
+#   pip install -r requirements.txt
+#
 datasets==5.0.1
 fsspec==2026.6.0
+huggingface_hub==1.29.0
+matplotlib==3.11.1
+nltk==3.10.3
 numpy==2.4.6
-huggingface_hub==<pin>
-sentence-transformers==<pin>
-nltk==<pin>
-matplotlib==<pin>
-pyyaml==<pin>
-pytest==<pin>datasets==5.0.1
-fsspec==2026.6.0
-numpy==2.4.6
+pandas==3.0.5
+pytest==9.1.1
+PyYAML==6.0.3
+safetensors==0.8.0
+scikit-learn==1.9.0
+scipy==1.17.1
+sentence-transformers==6.0.1
 tokenizers==0.23.2
-torch==2.14.0+cu126
+tqdm==4.70.0
 transformers==5.16.1

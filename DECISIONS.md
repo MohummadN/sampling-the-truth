@@ -26,36 +26,24 @@ This file becomes the paper's Experimental Setup section.
 2026-09-05  Pinned transformers==5.16.1 because generation defaults and DoLa
             behavior differ across major Transformers versions.
 
-2026-09-05  max_new_tokens=256 for every arm: long enough for biography
-            generation while keeping the full grid computationally feasible.
+2026-09-06  Fluency scorer = `Qwen/Qwen2.5-0.5B` (base), fp32.
+            Disjoint from all three generators, so no model scores its own
+            family's outputs. Ungated and small. One scorer for every arm and
+            model, so perplexity is comparable across the whole grid.
+
+2026-09-06  torch 2.14.0+cu126.
+            The cluster's GPUs are TITAN Xp (sm_61) and CUDA 13 dropped Pascal,
+            so the default cu130 wheel had no usable kernels and every run
+            silently fell back to CPU. cu126 ships sm_60, binary-compatible
+            upward to sm_61.
+
+2026-09-06  Every loader returns `(tok, model)`.
+            `src/models.py::load` and `src/metrics/fluency.py::load_scorer`
+            alike, so call sites never have to remember which order applies.
 
 ## Still open
-- Scorer model for perplexity (must not be one of the 3 generators)
 - Entailment threshold theta          (tune on dev only)
 - dola_layers: "low" vs "high"        (tune on dev only)
 - Seeds (3 integers)
 - Dev/test split size — currently 20/80
 - SC selection embedder
-
-## Fluency scorer
-`Qwen/Qwen2.5-0.5B` (base), fp32.
-Disjoint from all three generators (gpt2, Llama-3.2-1B/3B), so no model scores
-its own family's outputs. Ungated, 0.5B. One scorer for every arm and model,
-so perplexity is comparable across the whole grid.
-
-## Torch build
-`torch 2.14.0+cu126`.
-The cluster's GPUs are TITAN Xp (sm_61). The default cu130 wheel has no Pascal
-kernels — CUDA 13 dropped Pascal — so every run silently fell back to CPU.
-cu126 ships sm_60, which is binary-compatible upward to sm_61.
-
-## Torch build
-`torch 2.14.0+cu126`.
-The cluster's GPUs are TITAN Xp (sm_61). The default cu130 wheel has no Pascal
-kernels — CUDA 13 dropped Pascal — so every run silently fell back to CPU.
-cu126 ships sm_60, which is binary-compatible upward to sm_61.
-
-## Loader return order
-Every loader returns `(tok, model)` — `src/models.py::load` and
-`src/metrics/fluency.py::load_scorer` alike, so call sites never have to
-remember which is which.
