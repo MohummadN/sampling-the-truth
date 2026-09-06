@@ -48,3 +48,14 @@ so perplexity is comparable across the whole grid.
 The cluster's GPUs are TITAN Xp (sm_61). The default cu130 wheel has no Pascal
 kernels — CUDA 13 dropped Pascal — so every run silently fell back to CPU.
 cu126 ships sm_60, which is binary-compatible upward to sm_61.
+
+## Torch build
+`torch 2.14.0+cu126`.
+The cluster's GPUs are TITAN Xp (sm_61). The default cu130 wheel has no Pascal
+kernels — CUDA 13 dropped Pascal — so every run silently fell back to CPU.
+cu126 ships sm_60, which is binary-compatible upward to sm_61.
+
+## Loader return order
+Every loader returns `(tok, model)` — `src/models.py::load` and
+`src/metrics/fluency.py::load_scorer` alike, so call sites never have to
+remember which is which.

@@ -1,3 +1,9 @@
+"""Fluency metric: perplexity under a fixed external scorer model.
+
+The scorer must NOT be one of the generating models (gpt2, Llama-3.2-1B/3B),
+or a model would find its own family's outputs unusually predictable (06 §6.2).
+See DECISIONS.md.
+"""
 from __future__ import annotations
 
 import torch
@@ -19,23 +25,30 @@ def _device() -> str:
     major, minor = torch.cuda.get_device_capability()
     for arch in torch.cuda.get_arch_list():
         if not arch.startswith("sm_"):
-            continue                      # skip compute_XX (PTX) entries
-        if int(arch[3:-1]) == major and int(arch[-1]) <= minor:
+            continue                        # skip compute_XX (PTX) entries
+        code = "".join(c for c in arch[3:] if c.isdigit())   # sm_90a -> "90"
+        if not code:
+            continue
+        if int(code[:-1]) == major and int(code[-1]) <= minor:
             return "cuda"
     return "cpu"
 
 
 def load_scorer(name: str = SCORER):
-    """Load the perplexity scorer. Returns (model, tokenizer), eval mode."""
+    """Load the perplexity scorer. Returns (tokenizer, model), eval mode.
+
+    Order matches src/models.py's load() -> (tok, model), so every loader in
+    the repo unpacks the same way.
+    """
     tok = AutoTokenizer.from_pretrained(name)
     model = AutoModelForCausalLM.from_pretrained(name, dtype=torch.float32)
     model.to(_device())
     model.eval()
-    return model, tok
+    return tok, model
 
 
 @torch.no_grad()
-def perplexity(text: str, model, tok) -> float:
+def perplexity(text: str, tok, model) -> float:
     """Base-e perplexity of one string. Lower = more predictable.
 
     Returns nan for strings of fewer than 2 tokens (nothing to condition on).
