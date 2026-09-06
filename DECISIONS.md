@@ -42,3 +42,9 @@ This file becomes the paper's Experimental Setup section.
 Disjoint from all three generators (gpt2, Llama-3.2-1B/3B), so no model scores
 its own family's outputs. Ungated, 0.5B. One scorer for every arm and model,
 so perplexity is comparable across the whole grid.
+
+## Torch build
+`torch 2.14.0+cu126`.
+The cluster's GPUs are TITAN Xp (sm_61). The default cu130 wheel has no Pascal
+kernels — CUDA 13 dropped Pascal — so every run silently fell back to CPU.
+cu126 ships sm_60, which is binary-compatible upward to sm_61.

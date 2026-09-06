@@ -1,9 +1,3 @@
-"""Fluency metric: perplexity under a fixed external scorer model.
-
-The scorer must NOT be one of the generating models (gpt2, Llama-3.2-1B/3B),
-or a model would find its own family's outputs unusually predictable (06 §6.2).
-See DECISIONS.md.
-"""
 from __future__ import annotations
 
 import torch
@@ -13,15 +7,20 @@ SCORER = "Qwen/Qwen2.5-0.5B"
 
 
 def _device() -> str:
-    """CUDA only if this torch build has kernels for the GPU actually present.
+    """CUDA only if this torch build has kernels this GPU can actually run.
 
-    The TAU login nodes carry GTX TITAN X (sm_52); torch 2.14+cu130 ships
-    nothing below sm_75, so `.to("cuda")` succeeds and the first forward pass
-    dies with `no kernel image is available`. Fall back to CPU instead.
+    CUDA guarantees binary compatibility upward within a major version: a cubin
+    built for sm_X.y runs on sm_X.z for z >= y. The cluster's TITAN Xp is
+    sm_61 and the cu126 wheel ships sm_60, which is therefore usable — a plain
+    `"sm_61" in get_arch_list()` test would wrongly fall back to CPU.
     """
-    if torch.cuda.is_available():
-        major, minor = torch.cuda.get_device_capability()
-        if f"sm_{major}{minor}" in torch.cuda.get_arch_list():
+    if not torch.cuda.is_available():
+        return "cpu"
+    major, minor = torch.cuda.get_device_capability()
+    for arch in torch.cuda.get_arch_list():
+        if not arch.startswith("sm_"):
+            continue                      # skip compute_XX (PTX) entries
+        if int(arch[3:-1]) == major and int(arch[-1]) <= minor:
             return "cuda"
     return "cpu"
 
