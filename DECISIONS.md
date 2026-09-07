@@ -41,7 +41,79 @@ This file becomes the paper's Experimental Setup section.
             `src/models.py::load` and `src/metrics/fluency.py::load_scorer`
             alike, so call sites never have to remember which order applies.
 
+2026-09-07  Prompt = "Tell me a bio of {entity}." verbatim, base-model raw text.
+            FActScore's prompt, used unchanged for citability. A more
+            instructive prompt would lower output entropy and shrink the very
+            differences between decoders that the study measures.
+
+2026-09-07  Verification unit = sentence, not atomic fact.
+            Deliberate deviation from FActScore: no LM decomposition step, so
+            it is deterministic, free and fast. Costs, stated in Limitations:
+            mixed-truth sentences collapse to one label, factuality becomes
+            weakly length-dependent, and absolute numbers are not comparable
+            to published FActScore values.
+
+2026-09-07  Metric name = "support rate", never "FActScore".
+            It measures whether a claim is supported by the entity's Wikipedia
+            page, not whether it is true. Mean sentence length is reported per
+            arm so the length-dependence above can be checked.
+
+2026-09-07  Manual validation uses three labels: supported, unsupported, and
+            "true but absent from the page".
+            NLI entailment is not truth. High-temperature arms wander into
+            peripheral true facts the page omits, which would otherwise score
+            as hallucination and bias the result toward our own hypothesis.
+            Refusals are counted and reported as a separate column.
+
+2026-09-07  Entities: FActScore's published list if obtainable; otherwise 100
+            sampled in 3 strata by Wikipedia article length (~33 each).
+            Disambiguation pages and redirects excluded; a minimum reference
+            length required; the entity -> Wikipedia-title mapping stored
+            explicitly. Frozen once in data/entities.json with a fixed seed and
+            a split field, and never regenerated - choosing entities after
+            seeing results is selection bias.
+
+2026-09-07  All arm comparisons are paired (bootstrap over prompts). No
+            unpaired tests; confidence intervals reported, not just means.
+            Per-entity support rates have sigma ~ 0.25, so SE ~ 0.25/sqrt(100)
+            = +/-2.5 points and an unpaired comparison would need 5-7 point
+            gaps. Pairing cancels between-entity variance. sigma is measured on
+            dev rather than assumed; gaps under ~3 points are treated as noise.
+
+2026-09-07  Wikipedia snapshot pinned to 20231101.en, indexed in a single pass
+            and cached to data/reference_pages.json.
+            A later snapshot could contain facts the models never saw. The HW3
+            linear scan walks 6M rows per page and would burn queue time. The
+            cache is a build artifact: gitignored, with the build script
+            committed, and every entity asserted to resolve.
+
+2026-09-07  Length control: report mean +/- sd generated tokens per arm, and
+            recompute all length-sensitive metrics on a fixed 128-token prefix.
+            Greedy and beam run to the cap while nucleus terminates early, so
+            part of any raw diversity gap is a length gap - and it flatters our
+            hypothesis. The trailing incomplete sentence is dropped, by the
+            same rule for every arm, noting this removes more text from capped
+            arms.
+
+2026-09-07  Log hit_cap = (gen_tokens >= max_new_tokens) on every record; no
+            min_new_tokens floor.
+            The per-arm cap rate measures degeneration directly and catches EOS
+            misconfiguration. A floor would force models past a natural EOS and
+            contaminate the abstention signal unevenly across arms; empty
+            generations are instead counted, excluded from the denominator, and
+            reported.
+
+2026-09-07  Splits: 20 dev / 80 test, fixed seed, decided once.
+            We tune theta, dola_layers, nucleus p and min_chars, so splits
+            apply even though nothing is trained. All tuning, debugging and
+            eyeballing happen on the 20; the grid runs on all 100 but only the
+            80 are reported. theta is chosen to maximise agreement with the
+            manual labels - never to maximise the gap between arms.
+
 ## Still open
+- Deduplicate repeated identical sentences before verifying, or not?
+  dedup = distinct-claim accuracy; no-dedup = token-weighted accuracy.
+  Very different numbers for greedy and beam - decide deliberately.
 - Entailment threshold theta          (tune on dev only)
 - dola_layers: "low" vs "high"        (tune on dev only)
 - Seeds (3 integers)
