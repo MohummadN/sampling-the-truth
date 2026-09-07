@@ -119,3 +119,10 @@ This file becomes the paper's Experimental Setup section.
 - Seeds (3 integers)
 - Dev/test split size — currently 20/80
 - SC selection embedder
+
+2026-09-07  dtype = torch.float16 for all three generator models.
+            Measured on TITAN Xp (sm_61, gpt2, 256 greedy tokens): fp32 114.6
+            tok/s, fp16 117.0, bf16 77.1 — bf16 is emulated (not native below
+            sm_80). Llama-3.2-3B needs ~12.8 GB in fp32 and the card has 12.7,
+            so fp32 is impossible for the largest model; the dtype must be
+            identical across scales or precision is confounded with scale.
