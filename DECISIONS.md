@@ -126,3 +126,10 @@ This file becomes the paper's Experimental Setup section.
             sm_80). Llama-3.2-3B needs ~12.8 GB in fp32 and the card has 12.7,
             so fp32 is impossible for the largest model; the dtype must be
             identical across scales or precision is confounded with scale.
+
+2026-09-07  Slurm sharding is by (model, seed), never finer.
+            Loading Llama-3.2-3B from the netapp share takes ~6 min warm
+            (~11 min cold) — it is bandwidth-bound, not download-bound. One job
+            therefore loads a model once and generates all 9 arms x 100 prompts
+            inside it. Sharding per arm or per prompt would pay that 6 minutes
+            again for every shard.
