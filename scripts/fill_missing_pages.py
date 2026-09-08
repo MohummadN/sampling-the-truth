@@ -1,9 +1,16 @@
 """Second pass over the pinned snapshot for titles the first pass missed.
 
-The first streaming pass found 454/500, with the misses randomly distributed
-across famous and obscure entities alike — consistent with the streaming
-reader dropping rows, not with the pages being absent. This re-runs the pass
-against only the missing titles and merges the result into the cache.
+Kept for the record, not part of the build. scripts/build_reference_pages.py is.
+
+The first pass found 454/500. This second, independent full pass over all
+6,407,814 rows found 0 of the remaining 46. The absence is therefore
+systematic, not a transient read failure — see DECISIONS.md. The missing set is
+dominated by heavily-templated articles (major historical figures, athletes
+with large statistics tables), which the HTML-to-text conversion behind this
+dump drops.
+
+Re-running it is harmless: it merges anything it finds into the cache and
+reports whatever is still missing.
 
     srun -p studentkillable --time=01:00:00 python scripts/fill_missing_pages.py
 """
@@ -44,13 +51,15 @@ def main() -> None:
     pages.update(found)
     with open(PAGES_JSON, "w") as f:
         json.dump(pages, f, ensure_ascii=False)
-    print(f"\nfound {len(found)}, cache now {len(pages)}/500, {time.time()-t0:.0f}s")
+    print(f"\nfound {len(found)}, cache now {len(pages)}/{len(entities)}, "
+          f"{time.time()-t0:.0f}s")
 
     still = sorted(wanted - set(found))
     if still:
         print(f"\nstill missing ({len(still)}):")
         for s in still:
             print("   ", s)
+
 
 if __name__ == "__main__":
     main()

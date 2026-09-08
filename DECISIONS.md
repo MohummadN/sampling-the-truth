@@ -144,3 +144,8 @@ This file becomes the paper's Experimental Setup section.
             table-dense biographies and from the most famous entities; if
             anything this reduces ceiling effects. 100 entities are sampled
             from the 454 and the exclusion list is committed for reproducibility.
+
+2026-09-07  data/reference_pages.json is committed, not gitignored.
+            At ~6 MB it is small enough to version, and committing it makes the
+            repo reproducible from a clone without re-streaming 6.4M Wikipedia
+            rows. It also keeps the data tests runnable off-cluster.
