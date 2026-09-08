@@ -133,3 +133,14 @@ This file becomes the paper's Experimental Setup section.
             therefore loads a model once and generates all 9 arms x 100 prompts
             inside it. Sharding per arm or per prompt would pay that 6 minutes
             again for every shard.
+
+2026-09-07  Candidate pool = 454 of FActScore's 500 entities.
+            46 titles are absent from wikimedia/wikipedia 20231101.en. Two full
+            independent passes over all 6,407,814 rows found 0 of them, so the
+            gap is systematic, not transient. The missing set is dominated by
+            heavily-templated articles — major historical figures and athletes
+            with large statistics tables — which the HTML-to-text conversion
+            behind this dump drops. The pool is therefore tilted away from
+            table-dense biographies and from the most famous entities; if
+            anything this reduces ceiling effects. 100 entities are sampled
+            from the 454 and the exclusion list is committed for reproducibility.

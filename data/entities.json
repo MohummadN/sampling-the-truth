@@ -1,0 +1,902 @@
+[
+  {
+    "entity": "14th Dalai Lama",
+    "page_chars": 82847,
+    "page_sentences": 506,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p000",
+    "prompt": "Tell me a bio of 14th Dalai Lama."
+  },
+  {
+    "entity": "Aaron Burr",
+    "page_chars": 51250,
+    "page_sentences": 390,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p001",
+    "prompt": "Tell me a bio of Aaron Burr."
+  },
+  {
+    "entity": "Abdullahi Mohammad Ahmad Hassan",
+    "page_chars": 6904,
+    "page_sentences": 50,
+    "stratum": 1,
+    "split": "dev",
+    "prompt_id": "p002",
+    "prompt": "Tell me a bio of Abdullahi Mohammad Ahmad Hassan."
+  },
+  {
+    "entity": "Abraham Ancer",
+    "page_chars": 6232,
+    "page_sentences": 44,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p003",
+    "prompt": "Tell me a bio of Abraham Ancer."
+  },
+  {
+    "entity": "Adnan Sami",
+    "page_chars": 17345,
+    "page_sentences": 140,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p004",
+    "prompt": "Tell me a bio of Adnan Sami."
+  },
+  {
+    "entity": "Alexander Vovin",
+    "page_chars": 4412,
+    "page_sentences": 39,
+    "stratum": 0,
+    "split": "dev",
+    "prompt_id": "p005",
+    "prompt": "Tell me a bio of Alexander Vovin."
+  },
+  {
+    "entity": "Amr Shabana",
+    "page_chars": 4809,
+    "page_sentences": 28,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p006",
+    "prompt": "Tell me a bio of Amr Shabana."
+  },
+  {
+    "entity": "Anderson Silva",
+    "page_chars": 38365,
+    "page_sentences": 239,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p007",
+    "prompt": "Tell me a bio of Anderson Silva."
+  },
+  {
+    "entity": "Andreas Ivanschitz",
+    "page_chars": 4130,
+    "page_sentences": 27,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p008",
+    "prompt": "Tell me a bio of Andreas Ivanschitz."
+  },
+  {
+    "entity": "Andriy Yarmolenko",
+    "page_chars": 11829,
+    "page_sentences": 77,
+    "stratum": 1,
+    "split": "dev",
+    "prompt_id": "p009",
+    "prompt": "Tell me a bio of Andriy Yarmolenko."
+  },
+  {
+    "entity": "André Le Nôtre",
+    "page_chars": 8225,
+    "page_sentences": 63,
+    "stratum": 1,
+    "split": "dev",
+    "prompt_id": "p010",
+    "prompt": "Tell me a bio of André Le Nôtre."
+  },
+  {
+    "entity": "Arif Mohammad Khan",
+    "page_chars": 5195,
+    "page_sentences": 36,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p011",
+    "prompt": "Tell me a bio of Arif Mohammad Khan."
+  },
+  {
+    "entity": "Ayman al-Zawahiri",
+    "page_chars": 42280,
+    "page_sentences": 267,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p012",
+    "prompt": "Tell me a bio of Ayman al-Zawahiri."
+  },
+  {
+    "entity": "Belisarius",
+    "page_chars": 76961,
+    "page_sentences": 569,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p013",
+    "prompt": "Tell me a bio of Belisarius."
+  },
+  {
+    "entity": "Bobo Baldé",
+    "page_chars": 10704,
+    "page_sentences": 77,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p014",
+    "prompt": "Tell me a bio of Bobo Baldé."
+  },
+  {
+    "entity": "Carl Braun (obstetrician)",
+    "page_chars": 3635,
+    "page_sentences": 22,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p015",
+    "prompt": "Tell me a bio of Carl Braun (obstetrician)."
+  },
+  {
+    "entity": "Cha Eun-woo",
+    "page_chars": 8657,
+    "page_sentences": 70,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p016",
+    "prompt": "Tell me a bio of Cha Eun-woo."
+  },
+  {
+    "entity": "Charley Boorman",
+    "page_chars": 8734,
+    "page_sentences": 61,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p017",
+    "prompt": "Tell me a bio of Charley Boorman."
+  },
+  {
+    "entity": "Chris Cuomo",
+    "page_chars": 12062,
+    "page_sentences": 90,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p018",
+    "prompt": "Tell me a bio of Chris Cuomo."
+  },
+  {
+    "entity": "Cleopatra",
+    "page_chars": 83609,
+    "page_sentences": 485,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p019",
+    "prompt": "Tell me a bio of Cleopatra."
+  },
+  {
+    "entity": "Cédric Bakambu",
+    "page_chars": 11499,
+    "page_sentences": 71,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p020",
+    "prompt": "Tell me a bio of Cédric Bakambu."
+  },
+  {
+    "entity": "Dana Awartani",
+    "page_chars": 2782,
+    "page_sentences": 21,
+    "stratum": 0,
+    "split": "dev",
+    "prompt_id": "p021",
+    "prompt": "Tell me a bio of Dana Awartani."
+  },
+  {
+    "entity": "Daniel Ek",
+    "page_chars": 4285,
+    "page_sentences": 36,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p022",
+    "prompt": "Tell me a bio of Daniel Ek."
+  },
+  {
+    "entity": "Deitrick Haddon",
+    "page_chars": 3538,
+    "page_sentences": 29,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p023",
+    "prompt": "Tell me a bio of Deitrick Haddon."
+  },
+  {
+    "entity": "Diafra Sakho",
+    "page_chars": 9915,
+    "page_sentences": 77,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p024",
+    "prompt": "Tell me a bio of Diafra Sakho."
+  },
+  {
+    "entity": "Dominique Blake",
+    "page_chars": 4023,
+    "page_sentences": 31,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p025",
+    "prompt": "Tell me a bio of Dominique Blake."
+  },
+  {
+    "entity": "Douglas Wood (engineer)",
+    "page_chars": 4786,
+    "page_sentences": 33,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p026",
+    "prompt": "Tell me a bio of Douglas Wood (engineer)."
+  },
+  {
+    "entity": "Emcee N.I.C.E.",
+    "page_chars": 8786,
+    "page_sentences": 54,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p027",
+    "prompt": "Tell me a bio of Emcee N.I.C.E.."
+  },
+  {
+    "entity": "Esteban Espíndola",
+    "page_chars": 2910,
+    "page_sentences": 22,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p028",
+    "prompt": "Tell me a bio of Esteban Espíndola."
+  },
+  {
+    "entity": "Fahadh Faasil",
+    "page_chars": 12800,
+    "page_sentences": 97,
+    "stratum": 2,
+    "split": "dev",
+    "prompt_id": "p029",
+    "prompt": "Tell me a bio of Fahadh Faasil."
+  },
+  {
+    "entity": "Felipe (footballer, born 1977)",
+    "page_chars": 3753,
+    "page_sentences": 20,
+    "stratum": 0,
+    "split": "dev",
+    "prompt_id": "p030",
+    "prompt": "Tell me a bio of Felipe (footballer, born 1977)."
+  },
+  {
+    "entity": "Fifi Cooper",
+    "page_chars": 3511,
+    "page_sentences": 26,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p031",
+    "prompt": "Tell me a bio of Fifi Cooper."
+  },
+  {
+    "entity": "Frank Middlemass",
+    "page_chars": 6005,
+    "page_sentences": 37,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p032",
+    "prompt": "Tell me a bio of Frank Middlemass."
+  },
+  {
+    "entity": "Félix María Zuloaga",
+    "page_chars": 17097,
+    "page_sentences": 122,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p033",
+    "prompt": "Tell me a bio of Félix María Zuloaga."
+  },
+  {
+    "entity": "George VI",
+    "page_chars": 28973,
+    "page_sentences": 199,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p034",
+    "prompt": "Tell me a bio of George VI."
+  },
+  {
+    "entity": "Geraldo de Barros",
+    "page_chars": 12194,
+    "page_sentences": 69,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p035",
+    "prompt": "Tell me a bio of Geraldo de Barros."
+  },
+  {
+    "entity": "Griselda Blanco",
+    "page_chars": 7582,
+    "page_sentences": 50,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p036",
+    "prompt": "Tell me a bio of Griselda Blanco."
+  },
+  {
+    "entity": "Ian Khama",
+    "page_chars": 14530,
+    "page_sentences": 97,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p037",
+    "prompt": "Tell me a bio of Ian Khama."
+  },
+  {
+    "entity": "Idi Amin",
+    "page_chars": 39247,
+    "page_sentences": 283,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p038",
+    "prompt": "Tell me a bio of Idi Amin."
+  },
+  {
+    "entity": "Ilhan Omar",
+    "page_chars": 44763,
+    "page_sentences": 273,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p039",
+    "prompt": "Tell me a bio of Ilhan Omar."
+  },
+  {
+    "entity": "Imbolo Mbue",
+    "page_chars": 4044,
+    "page_sentences": 27,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p040",
+    "prompt": "Tell me a bio of Imbolo Mbue."
+  },
+  {
+    "entity": "Ivan Toms",
+    "page_chars": 5950,
+    "page_sentences": 49,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p041",
+    "prompt": "Tell me a bio of Ivan Toms."
+  },
+  {
+    "entity": "Jean Muir (actress)",
+    "page_chars": 3428,
+    "page_sentences": 27,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p042",
+    "prompt": "Tell me a bio of Jean Muir (actress)."
+  },
+  {
+    "entity": "Jeffrey Satinover",
+    "page_chars": 6818,
+    "page_sentences": 43,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p043",
+    "prompt": "Tell me a bio of Jeffrey Satinover."
+  },
+  {
+    "entity": "Jennifer Maia",
+    "page_chars": 13680,
+    "page_sentences": 71,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p044",
+    "prompt": "Tell me a bio of Jennifer Maia."
+  },
+  {
+    "entity": "Jesse Chacón",
+    "page_chars": 4719,
+    "page_sentences": 28,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p045",
+    "prompt": "Tell me a bio of Jesse Chacón."
+  },
+  {
+    "entity": "Joe McGinniss",
+    "page_chars": 13425,
+    "page_sentences": 102,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p046",
+    "prompt": "Tell me a bio of Joe McGinniss."
+  },
+  {
+    "entity": "John Morris (curler)",
+    "page_chars": 21059,
+    "page_sentences": 150,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p047",
+    "prompt": "Tell me a bio of John Morris (curler)."
+  },
+  {
+    "entity": "Joseph A. Lopez",
+    "page_chars": 6727,
+    "page_sentences": 47,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p048",
+    "prompt": "Tell me a bio of Joseph A. Lopez."
+  },
+  {
+    "entity": "Joseph Kony",
+    "page_chars": 14336,
+    "page_sentences": 117,
+    "stratum": 2,
+    "split": "dev",
+    "prompt_id": "p049",
+    "prompt": "Tell me a bio of Joseph Kony."
+  },
+  {
+    "entity": "José Cardozo",
+    "page_chars": 8860,
+    "page_sentences": 54,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p050",
+    "prompt": "Tell me a bio of José Cardozo."
+  },
+  {
+    "entity": "Kajal Aggarwal",
+    "page_chars": 19509,
+    "page_sentences": 166,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p051",
+    "prompt": "Tell me a bio of Kajal Aggarwal."
+  },
+  {
+    "entity": "Kari Matchett",
+    "page_chars": 3346,
+    "page_sentences": 32,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p052",
+    "prompt": "Tell me a bio of Kari Matchett."
+  },
+  {
+    "entity": "Karl Urban",
+    "page_chars": 7297,
+    "page_sentences": 55,
+    "stratum": 1,
+    "split": "dev",
+    "prompt_id": "p053",
+    "prompt": "Tell me a bio of Karl Urban."
+  },
+  {
+    "entity": "Kerwin Bell",
+    "page_chars": 16363,
+    "page_sentences": 100,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p054",
+    "prompt": "Tell me a bio of Kerwin Bell."
+  },
+  {
+    "entity": "Kevin De Bruyne",
+    "page_chars": 31740,
+    "page_sentences": 209,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p055",
+    "prompt": "Tell me a bio of Kevin De Bruyne."
+  },
+  {
+    "entity": "Kubota Beisen",
+    "page_chars": 3715,
+    "page_sentences": 36,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p056",
+    "prompt": "Tell me a bio of Kubota Beisen."
+  },
+  {
+    "entity": "Lou Briel",
+    "page_chars": 8470,
+    "page_sentences": 40,
+    "stratum": 1,
+    "split": "dev",
+    "prompt_id": "p057",
+    "prompt": "Tell me a bio of Lou Briel."
+  },
+  {
+    "entity": "Lunay (singer)",
+    "page_chars": 3004,
+    "page_sentences": 25,
+    "stratum": 0,
+    "split": "dev",
+    "prompt_id": "p058",
+    "prompt": "Tell me a bio of Lunay (singer)."
+  },
+  {
+    "entity": "Martha Cunz",
+    "page_chars": 3376,
+    "page_sentences": 38,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p059",
+    "prompt": "Tell me a bio of Martha Cunz."
+  },
+  {
+    "entity": "Marty Mayberry",
+    "page_chars": 7004,
+    "page_sentences": 53,
+    "stratum": 1,
+    "split": "dev",
+    "prompt_id": "p060",
+    "prompt": "Tell me a bio of Marty Mayberry."
+  },
+  {
+    "entity": "Michael Douglas",
+    "page_chars": 24835,
+    "page_sentences": 163,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p061",
+    "prompt": "Tell me a bio of Michael Douglas."
+  },
+  {
+    "entity": "Mindy Smith",
+    "page_chars": 4022,
+    "page_sentences": 31,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p062",
+    "prompt": "Tell me a bio of Mindy Smith."
+  },
+  {
+    "entity": "Namita Gokhale",
+    "page_chars": 12597,
+    "page_sentences": 61,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p063",
+    "prompt": "Tell me a bio of Namita Gokhale."
+  },
+  {
+    "entity": "Nikole Hannah-Jones",
+    "page_chars": 15737,
+    "page_sentences": 96,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p064",
+    "prompt": "Tell me a bio of Nikole Hannah-Jones."
+  },
+  {
+    "entity": "Nobuhiro Shimatani",
+    "page_chars": 4746,
+    "page_sentences": 22,
+    "stratum": 0,
+    "split": "dev",
+    "prompt_id": "p065",
+    "prompt": "Tell me a bio of Nobuhiro Shimatani."
+  },
+  {
+    "entity": "Nuh Omar",
+    "page_chars": 6989,
+    "page_sentences": 45,
+    "stratum": 1,
+    "split": "dev",
+    "prompt_id": "p066",
+    "prompt": "Tell me a bio of Nuh Omar."
+  },
+  {
+    "entity": "Pallavi Joshi",
+    "page_chars": 4860,
+    "page_sentences": 31,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p067",
+    "prompt": "Tell me a bio of Pallavi Joshi."
+  },
+  {
+    "entity": "Patricia Cladis",
+    "page_chars": 4401,
+    "page_sentences": 33,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p068",
+    "prompt": "Tell me a bio of Patricia Cladis."
+  },
+  {
+    "entity": "Pogo (musician)",
+    "page_chars": 5689,
+    "page_sentences": 31,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p069",
+    "prompt": "Tell me a bio of Pogo (musician)."
+  },
+  {
+    "entity": "Radja Nainggolan",
+    "page_chars": 10894,
+    "page_sentences": 68,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p070",
+    "prompt": "Tell me a bio of Radja Nainggolan."
+  },
+  {
+    "entity": "Raghav Juyal",
+    "page_chars": 6473,
+    "page_sentences": 52,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p071",
+    "prompt": "Tell me a bio of Raghav Juyal."
+  },
+  {
+    "entity": "Ralph Macchio",
+    "page_chars": 6600,
+    "page_sentences": 52,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p072",
+    "prompt": "Tell me a bio of Ralph Macchio."
+  },
+  {
+    "entity": "Ramli Sarip",
+    "page_chars": 3039,
+    "page_sentences": 22,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p073",
+    "prompt": "Tell me a bio of Ramli Sarip."
+  },
+  {
+    "entity": "Rangi Te Kanawa",
+    "page_chars": 2615,
+    "page_sentences": 21,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p074",
+    "prompt": "Tell me a bio of Rangi Te Kanawa."
+  },
+  {
+    "entity": "Richard Kuklinski",
+    "page_chars": 30877,
+    "page_sentences": 257,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p075",
+    "prompt": "Tell me a bio of Richard Kuklinski."
+  },
+  {
+    "entity": "Sada Thompson",
+    "page_chars": 3592,
+    "page_sentences": 25,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p076",
+    "prompt": "Tell me a bio of Sada Thompson."
+  },
+  {
+    "entity": "Sage Stallone",
+    "page_chars": 3231,
+    "page_sentences": 23,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p077",
+    "prompt": "Tell me a bio of Sage Stallone."
+  },
+  {
+    "entity": "Sami Shalom Chetrit",
+    "page_chars": 8716,
+    "page_sentences": 120,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p078",
+    "prompt": "Tell me a bio of Sami Shalom Chetrit."
+  },
+  {
+    "entity": "Sandra Pisani",
+    "page_chars": 5864,
+    "page_sentences": 34,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p079",
+    "prompt": "Tell me a bio of Sandra Pisani."
+  },
+  {
+    "entity": "Santiago Vergini",
+    "page_chars": 4885,
+    "page_sentences": 31,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p080",
+    "prompt": "Tell me a bio of Santiago Vergini."
+  },
+  {
+    "entity": "Sheldon T. Mills",
+    "page_chars": 4072,
+    "page_sentences": 26,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p081",
+    "prompt": "Tell me a bio of Sheldon T. Mills."
+  },
+  {
+    "entity": "Sofiane Feghouli",
+    "page_chars": 8342,
+    "page_sentences": 58,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p082",
+    "prompt": "Tell me a bio of Sofiane Feghouli."
+  },
+  {
+    "entity": "Stephanus Swart",
+    "page_chars": 5126,
+    "page_sentences": 47,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p083",
+    "prompt": "Tell me a bio of Stephanus Swart."
+  },
+  {
+    "entity": "Tacko Fall",
+    "page_chars": 11780,
+    "page_sentences": 79,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p084",
+    "prompt": "Tell me a bio of Tacko Fall."
+  },
+  {
+    "entity": "Ted Thompson",
+    "page_chars": 16071,
+    "page_sentences": 114,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p085",
+    "prompt": "Tell me a bio of Ted Thompson."
+  },
+  {
+    "entity": "Terrence Romeo",
+    "page_chars": 12719,
+    "page_sentences": 89,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p086",
+    "prompt": "Tell me a bio of Terrence Romeo."
+  },
+  {
+    "entity": "Thierry Henry",
+    "page_chars": 53280,
+    "page_sentences": 313,
+    "stratum": 2,
+    "split": "dev",
+    "prompt_id": "p087",
+    "prompt": "Tell me a bio of Thierry Henry."
+  },
+  {
+    "entity": "Tim Ferguson",
+    "page_chars": 11871,
+    "page_sentences": 98,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p088",
+    "prompt": "Tell me a bio of Tim Ferguson."
+  },
+  {
+    "entity": "Tom Coburn",
+    "page_chars": 33379,
+    "page_sentences": 219,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p089",
+    "prompt": "Tell me a bio of Tom Coburn."
+  },
+  {
+    "entity": "Tony Bellew",
+    "page_chars": 22929,
+    "page_sentences": 210,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p090",
+    "prompt": "Tell me a bio of Tony Bellew."
+  },
+  {
+    "entity": "Vadhir Derbez",
+    "page_chars": 5010,
+    "page_sentences": 37,
+    "stratum": 0,
+    "split": "test",
+    "prompt_id": "p091",
+    "prompt": "Tell me a bio of Vadhir Derbez."
+  },
+  {
+    "entity": "Valerie Harper",
+    "page_chars": 13021,
+    "page_sentences": 82,
+    "stratum": 2,
+    "split": "dev",
+    "prompt_id": "p092",
+    "prompt": "Tell me a bio of Valerie Harper."
+  },
+  {
+    "entity": "Vance Joy",
+    "page_chars": 8873,
+    "page_sentences": 75,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p093",
+    "prompt": "Tell me a bio of Vance Joy."
+  },
+  {
+    "entity": "Vicente Carrillo Fuentes",
+    "page_chars": 6858,
+    "page_sentences": 42,
+    "stratum": 1,
+    "split": "test",
+    "prompt_id": "p094",
+    "prompt": "Tell me a bio of Vicente Carrillo Fuentes."
+  },
+  {
+    "entity": "Walter Model",
+    "page_chars": 61917,
+    "page_sentences": 391,
+    "stratum": 2,
+    "split": "dev",
+    "prompt_id": "p095",
+    "prompt": "Tell me a bio of Walter Model."
+  },
+  {
+    "entity": "Will Keane",
+    "page_chars": 12611,
+    "page_sentences": 88,
+    "stratum": 2,
+    "split": "test",
+    "prompt_id": "p096",
+    "prompt": "Tell me a bio of Will Keane."
+  },
+  {
+    "entity": "William G. Angel",
+    "page_chars": 4087,
+    "page_sentences": 25,
+    "stratum": 0,
+    "split": "dev",
+    "prompt_id": "p097",
+    "prompt": "Tell me a bio of William G. Angel."
+  },
+  {
+    "entity": "Xi Jinping",
+    "page_chars": 108041,
+    "page_sentences": 659,
+    "stratum": 2,
+    "split": "dev",
+    "prompt_id": "p098",
+    "prompt": "Tell me a bio of Xi Jinping."
+  },
+  {
+    "entity": "Zewde Gebre-Sellassie",
+    "page_chars": 3853,
+    "page_sentences": 21,
+    "stratum": 0,
+    "split": "dev",
+    "prompt_id": "p099",
+    "prompt": "Tell me a bio of Zewde Gebre-Sellassie."
+  }
+]

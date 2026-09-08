@@ -7,3 +7,4 @@ __pycache__/
 .ipynb_checkpoints/
 .venv/
 .pytest_cache/
+data/reference_pages.json
