@@ -5,7 +5,7 @@ Run once, from the repo root:
 
 Writes:
     data/factscore_entities.txt   the 500 candidate names (committed — tiny)
-    data/reference_pages.json     title -> page text (gitignored — build artifact)
+    data/reference_pages.json     title -> page text (committed; ~6 MB)
 
 Never run this again. Every downstream job reads the cached JSON. See
 DECISIONS.md: the snapshot is pinned to 20231101.en because a later snapshot

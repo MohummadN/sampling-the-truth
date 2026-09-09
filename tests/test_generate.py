@@ -1,11 +1,20 @@
-import json
+import math
 
-from src.generate import append, cell_seed, load_done, run_key
+import pytest
+import torch
 
+from src.generate import append, cell_seed, generate_one, load_done, run_key
+from src.models import load
+
+ENT = {"prompt_id": "p000", "entity": "Ada Lovelace", "split": "dev",
+       "stratum": 0, "prompt": "Tell me a bio of Ada Lovelace."}
+
+
+# ------------------------------------------------------------------ no model
 
 def test_cell_seed_is_stable_across_processes():
-    """hashlib, not hash(): Python's hash() is salted per process, so seeds
-    would differ between runs and the study would not be reproducible."""
+    """hashlib, not hash(): Python's hash() is salted per process, so the same
+    cell would draw different samples on every run."""
     assert cell_seed("greedy", 1234, "p001") == cell_seed("greedy", 1234, "p001")
     assert cell_seed("greedy", 1234, "p001") == 244322643
 
@@ -31,3 +40,44 @@ def test_truncated_last_line_is_tolerated(tmp_path):
     with open(p, "a") as f:
         f.write('{"model": "gpt2", "decod')
     assert load_done(p) == {("gpt2", "greedy", 1, "p000")}
+
+
+# --------------------------------------------------------------- needs gpt2
+
+@pytest.fixture(scope="module")
+def gpt2_cpu():
+    """CPU + fp32 so these run anywhere, including a login node."""
+    return load("gpt2", dtype=torch.float32, device="cpu")
+
+
+def test_greedy_is_seed_invariant(gpt2_cpu):
+    """Greedy takes the argmax, so the seed must not change anything. If this
+    fails, sampling is on somewhere it should not be."""
+    tok, model = gpt2_cpu
+    a = generate_one(tok, model, "greedy", ENT, seed=1)["text"]
+    b = generate_one(tok, model, "greedy", ENT, seed=2)["text"]
+    assert a == b
+
+
+def test_sampling_is_seed_dependent(gpt2_cpu):
+    """The counterpart: if sampling were silently disabled, every seed would
+    return the same string and the whole diversity axis would be dead."""
+    tok, model = gpt2_cpu
+    outs = {generate_one(tok, model, "nucleus0.9", ENT, seed=s)["text"]
+            for s in (1, 2, 3)}
+    assert len(outs) > 1
+
+
+def test_beam_compute_exceeds_returned_tokens(gpt2_cpu):
+    """beam4 decodes num_beams sequences but returns one, so compute_tokens
+    must be 4x gen_tokens. Conflating them understates beam search's cost by
+    that factor, and matched inference compute is a headline claim."""
+    tok, model = gpt2_cpu
+    r = generate_one(tok, model, "beam4", ENT, seed=1)
+    assert r["compute_tokens"] == 4 * r["gen_tokens"]
+
+
+def test_greedy_compute_equals_returned(gpt2_cpu):
+    tok, model = gpt2_cpu
+    r = generate_one(tok, model, "greedy", ENT, seed=1)
+    assert r["compute_tokens"] == r["gen_tokens"]

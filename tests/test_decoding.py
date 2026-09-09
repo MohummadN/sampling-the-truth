@@ -1,7 +1,20 @@
+import os
+
 import pytest
 
-from src.decoding import ARMS, kwargs_for
+from src.decoding import ARMS, describe, kwargs_for
+from src.models import load
 
+
+@pytest.mark.skipif(not os.environ.get("SLOW"), reason="set SLOW=1 to load Llama")
+def test_arms_resolve_identically_across_models():
+    """The point of setting every field explicitly: gpt2 and Llama ship
+    different generation_config.json defaults, so an unset field would resolve
+    differently per model and the cross-model comparison would be invalid."""
+    _, gpt2 = load("gpt2")
+    _, llama = load("llama-1b")
+    for arm in ARMS:
+        assert describe(gpt2, arm) == describe(llama, arm), arm
 
 def test_every_arm_resolves() -> None:
     for arm in ARMS:

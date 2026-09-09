@@ -2,12 +2,12 @@
 
 Single source of truth mapping arm name -> generate() kwargs.
 Every arm shares max_new_tokens=256; sampling arms set top_k=0
-explicitly because HF defaults to top_k=50. Deterministic arms
+explicitly so no model-specific default can apply (transformers 5.x
+defaults it to None; 4.x defaulted to 50). Deterministic arms
 carry explicit sampling fields (unused, triggers a harmless HF
 warning) so nothing inherits from a model's generation_config.
 """
-
-from transformers import GenerationConfig
+import copy
 
 
 # Every arm receives the same maximum generation length.
@@ -121,10 +121,16 @@ def kwargs_for(arm: str) -> dict[str, object]:
 
 
 def describe(model, arm: str) -> dict[str, object]:
-    """Return the effective generation configuration for an arm."""
-    cfg = GenerationConfig.from_model_config(model.config)
-    cfg.update(**kwargs_for(arm))
+    """Return the effective generation configuration for an arm.
 
+    Must start from model.generation_config, NOT
+    former, and it is loaded from generation_config.json — which is exactly
+    where Llama's do_sample=True, temperature=0.6, top_p=0.9 live. config.json
+    carries none of them, so building from it would make this check blind to
+    the leak it exists to detect.
+    """
+    cfg = copy.deepcopy(model.generation_config)
+    cfg.update(**kwargs_for(arm))
     return {
         # Default None: dola_layers is absent on older transformers.
         field: getattr(cfg, field, None)
