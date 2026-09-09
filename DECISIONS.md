@@ -149,3 +149,10 @@ This file becomes the paper's Experimental Setup section.
             At ~6 MB it is small enough to version, and committing it makes the
             repo reproducible from a clone without re-streaming 6.4M Wikipedia
             rows. It also keeps the data tests runnable off-cluster.
+
+2026-09-09  Generations with fewer than 2 sentences are excluded from the
+            support-rate denominator and counted per arm.
+            Observed at GATE 1: beam4 produced 256 tokens of newline-separated
+            repetitions with no sentence-ending punctuation, which nltk splits
+            into a single "sentence". A denominator of 1 makes the score 0% or
+            100% on one label. Same rule as for empty generations.

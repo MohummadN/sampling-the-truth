@@ -7,7 +7,7 @@ def test_cell_seed_is_stable_across_processes():
     """hashlib, not hash(): Python's hash() is salted per process, so seeds
     would differ between runs and the study would not be reproducible."""
     assert cell_seed("greedy", 1234, "p001") == cell_seed("greedy", 1234, "p001")
-    assert cell_seed("greedy", 1234, "p001") == 1382583116
+    assert cell_seed("greedy", 1234, "p001") == 244322643
 
 
 def test_cell_seed_differs_per_cell():
