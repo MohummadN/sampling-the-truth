@@ -82,3 +82,46 @@ def test_greedy_compute_equals_returned(gpt2_cpu):
     r = generate_one(tok, model, "greedy", ENT, seed=1)
     assert r["compute_tokens"] == r["gen_tokens"]
     assert r["gen_tokens"] <= 256      # prompt stripped by index, not string
+
+
+# ------------------------------------------------------------------- locking
+
+def test_lock_refuses_a_live_owner(tmp_path):
+    """The collision the lock exists to prevent: two jobs appending to one
+    shard. sc_k5 records exceed the 4 KB atomic-append limit, so concurrent
+    writes corrupt lines rather than merely reordering them."""
+    import os
+    import socket
+
+    from src.generate import acquire_lock, release_lock
+
+    p = str(tmp_path / "shard.jsonl")
+    lock = acquire_lock(p)              # this process is the live owner
+    try:
+        with pytest.raises(SystemExit, match="still running"):
+            acquire_lock(p)
+    finally:
+        release_lock(lock)
+
+
+def test_lock_breaks_a_stale_owner(tmp_path):
+    """A pre-empted job cannot run its finally block. If its lock outlived it,
+    the resubmit would be blocked — defeating the whole resume design."""
+    import json
+
+    from src.generate import acquire_lock, release_lock
+
+    p = str(tmp_path / "shard.jsonl")
+    with open(p + ".lock", "w") as f:
+        json.dump({"slurm_job_id": None, "host": "a-host-that-is-not-this-one",
+                   "pid": 1, "started": "x"}, f)
+    lock = acquire_lock(p)              # must break it, not refuse
+    release_lock(lock)
+
+
+def test_lock_is_released_and_reacquirable(tmp_path):
+    from src.generate import acquire_lock, release_lock
+
+    p = str(tmp_path / "shard.jsonl")
+    release_lock(acquire_lock(p))
+    release_lock(acquire_lock(p))       # no leftover blocking the second run

@@ -93,60 +93,81 @@ def _read_lock(lock: str) -> dict:
 
 
 def _owner_alive(info: dict) -> bool:
-    """Is the job that wrote this lock still in the queue?
+    """Is the process that wrote this lock still running?
 
     studentkillable pre-empts jobs, and a killed job cannot run its finally
     block — so a lock that outlives its owner would block exactly the resubmit
     the resume logic exists to support.
+
+    Batch jobs are identified by SLURM_JOB_ID and checked with squeue.
+    Interactive runs have no job id, so fall back to a PID check, which is only
+    meaningful on the host that wrote the lock.
     """
     job = info.get("slurm_job_id")
     if not job:
-        return False                     # not a SLURM job; leftover is stale
+        if info.get("host") != socket.gethostname():
+            return False            # another machine; cannot tell, assume gone
+        try:
+            os.kill(int(info.get("pid", 0)), 0)     # signal 0 = existence check
+            return True
+        except (OSError, ValueError):
+            return False
     try:
         out = subprocess.check_output(
             ["squeue", "-h", "-j", str(job), "-o", "%T"],
             text=True, stderr=subprocess.DEVNULL).strip()
     except FileNotFoundError:
-        return False                     # no SLURM here at all
+        return False                # no SLURM here at all
     except subprocess.CalledProcessError:
-        return False                     # squeue: unknown job id -> it is gone
+        return False                # squeue: unknown job id -> it is gone
     return bool(out)
 
 
-def acquire_lock(path: str) -> str:
+def acquire_lock(path: str, attempts: int = 5) -> str:
     """One writer per shard, with automatic recovery from pre-emption.
 
     The filename is keyed on (model, seed) but --arms is free, so two jobs with
     different arm subsets would append to the same file. An sc_k5 record is
     ~7 KB, past the 4 KB atomic-append limit, so interleaved writes corrupt
     lines rather than merely reordering them.
+
+    A stale lock is claimed by renaming it, not by unlinking it: rename is
+    atomic, so exactly one process can win. Unlinking would let a second
+    process delete the lock a first had already recreated, leaving both
+    believing they held it.
     """
     lock = path + ".lock"
     info = {"slurm_job_id": os.environ.get("SLURM_JOB_ID"),
             "host": socket.gethostname(),
             "pid": os.getpid(),
             "started": time.strftime("%Y-%m-%dT%H:%M:%S")}
-    while True:
+    for _ in range(attempts):
         try:
             fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except FileExistsError:
             prev = _read_lock(lock)
             if _owner_alive(prev):
+                owner = (f"SLURM job {prev['slurm_job_id']}"
+                         if prev.get("slurm_job_id")
+                         else f"pid {prev.get('pid')}")
                 raise SystemExit(
-                    f"{lock} held by SLURM job {prev.get('slurm_job_id')} on "
-                    f"{prev.get('host')}, still running.\n"
+                    f"{lock} held by {owner} on {prev.get('host')}, "
+                    f"still running.\n"
                     f"Shards are keyed on (model, seed): one job per shard.")
-            print(f"breaking stale lock from job {prev.get('slurm_job_id')} "
+            claimed = f"{lock}.stale.{os.getpid()}"
+            try:
+                os.rename(lock, claimed)        # atomic: only one winner
+            except FileNotFoundError:
+                continue                        # someone else cleared it first
+            os.unlink(claimed)
+            print(f"broke stale lock from {prev.get('slurm_job_id') or 'pid ' + str(prev.get('pid'))} "
                   f"({prev.get('host')}, started {prev.get('started')})",
                   flush=True)
-            try:
-                os.unlink(lock)
-            except FileNotFoundError:
-                pass
             continue
         os.write(fd, json.dumps(info).encode())
         os.close(fd)
         return lock
+    raise SystemExit(f"could not acquire {lock} after {attempts} attempts")
 
 
 def release_lock(lock: str) -> None:
