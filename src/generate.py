@@ -11,7 +11,7 @@ See DECISIONS.md.
 Output is append-only and resumable: each record is flushed and fsynced as it
 is produced, and a re-run skips (model, decoding, seed, prompt_id) cells
 already present. studentkillable jobs get pre-empted — nothing may be lost on
-the way down. A lock file enforces one writer per shard.
+the way down, and a resubmit must never be blocked by the dead job's lock.
 """
 from __future__ import annotations
 
@@ -19,6 +19,8 @@ import argparse
 import hashlib
 import json
 import os
+import signal
+import socket
 import subprocess
 import time
 
@@ -81,25 +83,77 @@ def append(path: str, rec: dict) -> None:
         os.fsync(f.fileno())    # survive pre-emption, not just a clean exit
 
 
+# ----------------------------------------------------------------------- lock
+
+def _read_lock(lock: str) -> dict:
+    try:
+        return json.loads(open(lock).read())
+    except Exception:
+        return {}
+
+
+def _owner_alive(info: dict) -> bool:
+    """Is the job that wrote this lock still in the queue?
+
+    studentkillable pre-empts jobs, and a killed job cannot run its finally
+    block — so a lock that outlives its owner would block exactly the resubmit
+    the resume logic exists to support.
+    """
+    job = info.get("slurm_job_id")
+    if not job:
+        return False                     # not a SLURM job; leftover is stale
+    try:
+        out = subprocess.check_output(
+            ["squeue", "-h", "-j", str(job), "-o", "%T"],
+            text=True, stderr=subprocess.DEVNULL).strip()
+    except FileNotFoundError:
+        return False                     # no SLURM here at all
+    except subprocess.CalledProcessError:
+        return False                     # squeue: unknown job id -> it is gone
+    return bool(out)
+
+
 def acquire_lock(path: str) -> str:
-    """One writer per shard.
+    """One writer per shard, with automatic recovery from pre-emption.
 
     The filename is keyed on (model, seed) but --arms is free, so two jobs with
     different arm subsets would append to the same file. An sc_k5 record is
-    ~7 KB, well past the 4 KB atomic-append limit, so interleaved writes would
-    corrupt lines rather than merely reorder them.
+    ~7 KB, past the 4 KB atomic-append limit, so interleaved writes corrupt
+    lines rather than merely reordering them.
     """
     lock = path + ".lock"
+    info = {"slurm_job_id": os.environ.get("SLURM_JOB_ID"),
+            "host": socket.gethostname(),
+            "pid": os.getpid(),
+            "started": time.strftime("%Y-%m-%dT%H:%M:%S")}
+    while True:
+        try:
+            fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            prev = _read_lock(lock)
+            if _owner_alive(prev):
+                raise SystemExit(
+                    f"{lock} held by SLURM job {prev.get('slurm_job_id')} on "
+                    f"{prev.get('host')}, still running.\n"
+                    f"Shards are keyed on (model, seed): one job per shard.")
+            print(f"breaking stale lock from job {prev.get('slurm_job_id')} "
+                  f"({prev.get('host')}, started {prev.get('started')})",
+                  flush=True)
+            try:
+                os.unlink(lock)
+            except FileNotFoundError:
+                pass
+            continue
+        os.write(fd, json.dumps(info).encode())
+        os.close(fd)
+        return lock
+
+
+def release_lock(lock: str) -> None:
     try:
-        fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-    except FileExistsError:
-        raise SystemExit(
-            f"{lock} exists — another job is writing {path}.\n"
-            f"Shards are keyed on (model, seed): run one job per shard.\n"
-            f"If a previous job was killed, delete the lock file by hand.")
-    os.write(fd, f"{os.getpid()}\n".encode())
-    os.close(fd)
-    return lock
+        os.unlink(lock)
+    except FileNotFoundError:
+        pass
 
 
 # --------------------------------------------------------------------- seeding
@@ -222,6 +276,14 @@ def main() -> None:
     os.makedirs(OUT_DIR, exist_ok=True)
     out = args.out or f"{OUT_DIR}/gen_{args.model}_seed{args.seed}.jsonl"
     lock = acquire_lock(out)
+
+    def _release(signum=None, frame=None):
+        release_lock(lock)
+        if signum:
+            raise SystemExit(143)   # SLURM sends TERM before KILL
+
+    signal.signal(signal.SIGTERM, _release)
+
     try:
         done = load_done(out)
         todo = [(a, e) for a in arms for e in entities
@@ -252,7 +314,7 @@ def main() -> None:
 
         print(f"done in {(time.perf_counter()-t0)/60:.1f} min")
     finally:
-        os.unlink(lock)
+        release_lock(lock)
 
 
 if __name__ == "__main__":

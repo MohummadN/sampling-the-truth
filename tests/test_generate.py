@@ -81,3 +81,4 @@ def test_greedy_compute_equals_returned(gpt2_cpu):
     tok, model = gpt2_cpu
     r = generate_one(tok, model, "greedy", ENT, seed=1)
     assert r["compute_tokens"] == r["gen_tokens"]
+    assert r["gen_tokens"] <= 256      # prompt stripped by index, not string

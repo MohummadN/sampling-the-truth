@@ -123,8 +123,8 @@ def kwargs_for(arm: str) -> dict[str, object]:
 def describe(model, arm: str) -> dict[str, object]:
     """Return the effective generation configuration for an arm.
 
-    Must start from model.generation_config, NOT
-    former, and it is loaded from generation_config.json — which is exactly
+    Must start from model.generation_config, NOT model.config: generate() uses
+    the former, and it is loaded from generation_config.json — which is exactly
     where Llama's do_sample=True, temperature=0.6, top_p=0.9 live. config.json
     carries none of them, so building from it would make this check blind to
     the leak it exists to detect.
