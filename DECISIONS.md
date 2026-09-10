@@ -173,3 +173,15 @@ This file becomes the paper's Experimental Setup section.
             CUDA kernels are asynchronous; without a synchronize() bracket
             gen_time_s partly measures queueing, and gen_time_s is half the
             cost axis.
+
+2026-09-09  dola_layers frozen at "low" for the full grid.
+            Tuning it would require the verifier, which would delay the grid
+            launch past the point where 43 GPU-hours still fit in the schedule.
+            Low vs. high is instead compared on the 20 dev entities and
+            reported as a sensitivity check; if high wins, only the dola arm is
+            re-run (1 arm x 100 prompts x 3 seeds x 2 models).
+
+2026-09-09  Seeds = 1234, 5678, 9012.
+            Arbitrary by design and fixed before any result was seen. Three
+            seeds is not where statistical power comes from — the paired
+            bootstrap over prompts is — but it is what the proposal promised.
