@@ -292,6 +292,8 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=None,
                     help="first N prompts only (GATE 1)")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--allow-cpu", action="store_true",
+                    help="debugging only; never for grid shards")
     args = ap.parse_args()
 
     arms = [a.strip() for a in args.arms.split(",") if a.strip()]
@@ -326,6 +328,11 @@ def main() -> None:
             return
 
         tok, model = load(args.model)
+        if model.device.type != "cuda" and not args.allow_cpu:
+            raise SystemExit(
+                f"refusing to run on {model.device}: CPU records are "
+                f"numerically and RNG-incomparable with the GPU shards, and a "
+                f"3B shard would never finish. Resubmit this array index.")
         rev = revision(model)
         run_id = f"{args.model}-s{args.seed}-{int(time.time())}"
         print(f"loaded {args.model} rev={rev[:12]} on {model.device}", flush=True)

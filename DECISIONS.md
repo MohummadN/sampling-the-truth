@@ -182,10 +182,10 @@ This file becomes the paper's Experimental Setup section.
             re-run (1 arm x 100 prompts x 3 seeds x 2 models).
 
 2026-09-09  Seeds = 1234, 5678, 9012.
-            Arbitrary by design and fixed before any result was seen. Three
-            seeds is not where statistical power comes from — the paired
-            is not where statistical power comes from — the paired bootstrap
-            over prompts is — but it is what the proposal promised.
+            Arbitrary by design and fixed before any result was seen.
+            Three seeds is not where statistical power comes from — the
+            paired bootstrap over prompts is — but it is what the proposal
+            promised.
 
 2026-09-10  HF_HOME = $STORE/.cache/huggingface (not $STORE/hf).
             The Llama weights were downloaded into the .cache path before

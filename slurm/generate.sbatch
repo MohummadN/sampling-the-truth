@@ -3,7 +3,7 @@
 #SBATCH --partition=studentkillable
 #SBATCH --gres=gpu:1
 #SBATCH --time=12:00:00
-#SBATCH --array=0-8
+#SBATCH --array=0-8%3
 #SBATCH --output=logs/gen_%A_%a.out
 #SBATCH --requeue
 
