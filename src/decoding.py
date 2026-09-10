@@ -69,6 +69,14 @@ ARMS: dict[str, dict[str, object]] = {
     "dola": {
         **DETERMINISTIC,
         "dola_layers": "low",
+        # transformers 5.x moved DoLa out of core: it now loads
+        # transformers-community/dola as custom generate code.
+        "trust_remote_code": True,
+        # Pin the repo explicitly rather than relying on the deprecation
+        # shim, and ask for hidden states: the extracted implementation
+        # reads outputs.hidden_states, which 4.x used to request itself.
+        "custom_generate": "transformers-community/dola",
+        "output_hidden_states": True,
         "repetition_penalty": 1.2,
     },
 
@@ -92,6 +100,14 @@ ARMS: dict[str, dict[str, object]] = {
         "temperature": 1.0,
         "top_p": 0.9,
         "dola_layers": "low",
+        # transformers 5.x moved DoLa out of core: it now loads
+        # transformers-community/dola as custom generate code.
+        "trust_remote_code": True,
+        # Pin the repo explicitly rather than relying on the deprecation
+        # shim, and ask for hidden states: the extracted implementation
+        # reads outputs.hidden_states, which 4.x used to request itself.
+        "custom_generate": "transformers-community/dola",
+        "output_hidden_states": True,
     },
 }
 

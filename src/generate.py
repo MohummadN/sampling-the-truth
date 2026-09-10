@@ -227,6 +227,9 @@ def generate_one(tok, model, arm: str, entity: dict, seed: int) -> dict:
     _sync()
     dt = time.perf_counter() - t0
 
+    # output_hidden_states can flip the return type to a ModelOutput.
+    out = getattr(out, "sequences", out)
+
     new = out[:, inputs["input_ids"].shape[-1]:]        # strip prompt by INDEX
     counts = new_token_counts(new, tok.eos_token_id)
     texts = tok.batch_decode(new, skip_special_tokens=True)

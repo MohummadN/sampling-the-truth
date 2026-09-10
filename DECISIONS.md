@@ -197,3 +197,18 @@ This file becomes the paper's Experimental Setup section.
             HF_HOME did not point at. Batch jobs do not read ~/.bashrc, so
             every shard would have re-downloaded 9 GB against a gated repo with
             no token stored.
+
+2026-09-10  DoLa runs via custom_generate="transformers-community/dola" with
+            trust_remote_code=True.
+            transformers 5.x moved DoLa out of the core library; dola_layers
+            alone now raises. The implementation we run is therefore not the
+            library's own and not the one the DoLa paper describes — it is an
+            extraction of the 4.x code, pinned by the HF cache revision.
+            Belongs in Limitations.
+
+2026-09-10  Grid shards refuse to run on CPU (--allow-cpu overrides).
+            The first launch put five of nine shards on CPU after CUDA failed
+            to initialise, and they were producing records silently. CPU
+            records are RNG- and numerically incomparable with GPU ones, and a
+            3B shard would never finish. The array is also throttled to 4
+            concurrent tasks to stop five jobs landing on one node.
