@@ -208,3 +208,8 @@ This file becomes the paper's Experimental Setup section.
             records are RNG- and numerically incomparable with GPU ones, and a
             3B shard would never finish. The array is also throttled to 4
             concurrent tasks to stop five jobs landing on one node.
+
+2026-09-10  Decoding uses clean_up_tokenization_spaces=False.
+            That post-processing targets WordPiece and is destructive for BPE,
+            stripping spaces before punctuation. Both generator families are
+            BPE, and the altered strings would feed every text metric.

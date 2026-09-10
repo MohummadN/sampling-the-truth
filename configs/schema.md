@@ -15,6 +15,7 @@ Append-only, fsynced per record, resumable, one writer per shard (lock file).
 | `model_id` | str | full HF id |
 | `model_revision` | str | commit hash of the model snapshot |
 | `dtype` | str | `torch.float16` for all generators |
+| `device` | str | device that produced the record; every grid record is `cuda:*` |
 | `decoding` | str | arm name, see `src/decoding.py` |
 | `gen_kwargs` | obj | exact kwargs passed to `generate()` |
 | `seed` | int | run seed; the per-cell seed is derived, see `cell_seed` |

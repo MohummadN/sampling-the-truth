@@ -30,6 +30,7 @@ from transformers import set_seed
 
 from src.data import load_entities
 from src.decoding import ARMS, COMMON, kwargs_for
+from src.device import pick_device
 from src.models import DTYPE, MODELS, load, revision
 from src.text import split_sentences
 
@@ -239,7 +240,12 @@ def generate_one(tok, model, arm: str, entity: dict, seed: int) -> dict:
 
     new = out[:, inputs["input_ids"].shape[-1]:]        # strip prompt by INDEX
     counts = new_token_counts(new, tok.eos_token_id)
-    texts = tok.batch_decode(new, skip_special_tokens=True)
+    # clean_up_tokenization_spaces is a WordPiece post-process and is
+    # destructive for BPE — it strips spaces before punctuation, altering
+    # the very strings the diversity, sentence-split and factuality
+    # metrics run on. Both GPT-2 and Llama are BPE.
+    texts = tok.batch_decode(new, skip_special_tokens=True,
+                             clean_up_tokenization_spaces=False)
 
     multi = kw.get("num_return_sequences", 1) > 1
     text = None if multi else texts[0]
@@ -261,6 +267,7 @@ def generate_one(tok, model, arm: str, entity: dict, seed: int) -> dict:
         "model_id": None,
         "model_revision": None,
         "dtype": str(DTYPE),
+        "device": None,                 # filled by the caller
         "decoding": arm,
         "gen_kwargs": kw,
         "seed": seed,
@@ -327,12 +334,14 @@ def main() -> None:
         if not todo:
             return
 
-        tok, model = load(args.model)
-        if model.device.type != "cuda" and not args.allow_cpu:
+        # Checked BEFORE loading: a 3B load costs ~6 minutes off netapp, and
+        # pick_device() answers the same question in microseconds.
+        if pick_device() != "cuda" and not args.allow_cpu:
             raise SystemExit(
-                f"refusing to run on {model.device}: CPU records are "
-                f"numerically and RNG-incomparable with the GPU shards, and a "
-                f"3B shard would never finish. Resubmit this array index.")
+                "refusing to run on cpu: CPU records are numerically and "
+                "RNG-incomparable with the GPU shards, and a 3B shard would "
+                "never finish. Resubmit this array index.")
+        tok, model = load(args.model)
         rev = revision(model)
         run_id = f"{args.model}-s{args.seed}-{int(time.time())}"
         print(f"loaded {args.model} rev={rev[:12]} on {model.device}", flush=True)
@@ -342,6 +351,7 @@ def main() -> None:
             rec = generate_one(tok, model, arm, ent, args.seed)
             rec["model"] = args.model
             rec["model_id"] = MODELS[args.model]
+            rec["device"] = str(model.device)
             rec["model_revision"] = rev
             rec["run_id"] = run_id
             append(out, rec)

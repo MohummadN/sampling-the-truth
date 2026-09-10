@@ -125,3 +125,27 @@ def test_lock_is_released_and_reacquirable(tmp_path):
     p = str(tmp_path / "shard.jsonl")
     release_lock(acquire_lock(p))
     release_lock(acquire_lock(p))       # no leftover blocking the second run
+
+
+# ---------------------------------------------------------------------- DoLa
+
+@pytest.mark.parametrize("arm", ["dola", "dola_nucleus"])
+def test_dola_arms_generate(gpt2_cpu, arm):
+    """transformers 5.x moved DoLa out of core into transformers-community/dola,
+    loaded as remote code. dola_layers alone now raises, and the extracted
+    implementation needs the pinned repo — this is the arm that killed the
+    first grid launch, 500 records in."""
+    tok, model = gpt2_cpu
+    r = generate_one(tok, model, arm, ENT, seed=1)
+    assert r["text"] and r["text"].strip()
+    assert r["gen_tokens"] > 0
+
+
+@pytest.mark.parametrize("arm", ["dola", "dola_nucleus"])
+def test_dola_arms_carry_the_remote_code_contract(arm):
+    """If either kwarg is dropped, generate() raises at run time — six minutes
+    into a 3B shard rather than here, in two seconds."""
+    from src.decoding import kwargs_for
+    kw = kwargs_for(arm)
+    assert kw["custom_generate"] == "transformers-community/dola"
+    assert kw["trust_remote_code"] is True
