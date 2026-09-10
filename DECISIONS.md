@@ -190,3 +190,10 @@ This file becomes the paper's Experimental Setup section.
             Arbitrary by design, fixed before any result was seen. Three seeds
             is not where statistical power comes from — the paired bootstrap
             over prompts is — but it is what the proposal promised.
+
+2026-09-10  HF_HOME = $STORE/.cache/huggingface (not $STORE/hf).
+            The Llama weights were downloaded into the .cache path before
+            HF_HOME took effect, leaving two caches with the models in the one
+            HF_HOME did not point at. Batch jobs do not read ~/.bashrc, so
+            every shard would have re-downloaded 9 GB against a gated repo with
+            no token stored.

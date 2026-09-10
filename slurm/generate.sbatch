@@ -16,7 +16,7 @@ M=${MODELS[$SLURM_ARRAY_TASK_ID]}
 S=${SEEDS[$SLURM_ARRAY_TASK_ID]}
 
 export STORE=/home/morg/NLP_2526b/mohummadn
-export HF_HOME=$STORE/hf
+export HF_HOME=$STORE/.cache/huggingface
 export NLTK_DATA=$STORE/nltk_data
 source $STORE/miniconda3/bin/activate
 conda activate $STORE/venv
