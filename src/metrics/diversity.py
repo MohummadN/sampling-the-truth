@@ -12,7 +12,10 @@ from collections import Counter
 from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
 
 PREFIX_TOKENS = 128     # fixed-prefix length for the length-controlled variant
-_WORD = re.compile(r"[a-z0-9']+")
+# Unicode-aware: [a-z0-9']+ would shatter "Autónoma" into "aut"+"noma",
+# manufacturing n-grams that were never in the text. Seven entities have
+# accented names and their pages are dense with accented place names.
+_WORD = re.compile(r"[^\W_]+(?:'[^\W_]+)*")
 
 
 def tokenize_words(text: str) -> list[str]:

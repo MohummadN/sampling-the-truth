@@ -173,3 +173,11 @@ def test_prefix_changes_the_measured_value():
     full = distinct_n(text, 2)
     clipped = distinct_n(first_tokens(text, 24), 2)
     assert clipped > full
+
+def test_tokenizer_keeps_accented_letters():
+    """[a-z0-9']+ shattered "Autónoma" into "aut" + "noma", inflating token
+    counts and manufacturing n-grams. Seven of the 100 entities have accented
+    names — the subset where the models are weakest."""
+    assert tokenize_words("Universidad Nacional Autónoma de México") == \
+        ["universidad", "nacional", "autónoma", "de", "méxico"]
+    assert tokenize_words("Émile Zola") == ["émile", "zola"]

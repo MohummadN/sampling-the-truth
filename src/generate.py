@@ -146,7 +146,14 @@ def acquire_lock(path: str, attempts: int = 5) -> str:
             fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except FileExistsError:
             prev = _read_lock(lock)
-            if _owner_alive(prev):
+            # A requeued SLURM task keeps its job id, so after pre-emption it
+            # finds its OWN lock and squeue truthfully reports that job as
+            # running — it is the requeued instance asking about itself. The
+            # lock and --requeue are each correct alone and deadlock together.
+            mine = os.environ.get("SLURM_JOB_ID")
+            if prev.get("slurm_job_id") and prev["slurm_job_id"] == mine:
+                pass                    # our own lock from a pre-empted attempt
+            elif _owner_alive(prev):
                 owner = (f"SLURM job {prev['slurm_job_id']}"
                          if prev.get("slurm_job_id")
                          else f"pid {prev.get('pid')}")

@@ -63,7 +63,7 @@ def main() -> None:
         # nucleus terminates early, so length alone could produce the ordering.
         prefix = first_tokens(r["text"], 128)
         rep[arm].append(rep_n(prefix, 4))
-        loop[arm].append(loop_severity(r["text"]))
+        loop[arm].append(loop_severity(" ".join(prefix)))
         caps[arm].append(bool(r["hit_cap"]))
 
     print(f"{'arm':<16}{'n':>4}{'rep-4':>18}{'loop sev.':>18}{'cap rate':>10}")
