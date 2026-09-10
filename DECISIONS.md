@@ -184,10 +184,6 @@ This file becomes the paper's Experimental Setup section.
 2026-09-09  Seeds = 1234, 5678, 9012.
             Arbitrary by design and fixed before any result was seen. Three
             seeds is not where statistical power comes from — the paired
-            bootstrap over prompts is — but it is what the proposal promised.
-
-2026-09-10  Seeds = 1234, 5678, 9012.
-            Arbitrary by design, fixed before any result was seen. Three seeds
             is not where statistical power comes from — the paired bootstrap
             over prompts is — but it is what the proposal promised.
 
