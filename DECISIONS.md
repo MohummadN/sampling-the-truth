@@ -244,3 +244,20 @@ This file becomes the paper's Experimental Setup section.
             error") while s-003..s-006 work. Nine of nine shards landed on
             s-002 and refused; the GPU guard caught it in 40 seconds instead
             of producing an hour of CPU records.
+
+2026-09-11  GATE 2 (sanity experiment 1) passed on current code.
+            gpt2, seed 1234, first 30 entities, 3 arms, all 90 records on
+            cuda:0. Metrics on the first 128 word tokens (Unicode tokenizer);
+            95% CI across prompts, not seeds - greedy and beam-4 are
+            deterministic, so a seed-wise error bar would be exactly zero.
+                          rep-4            loop severity    hit cap
+            greedy        0.833 +/- 0.041  0.759 +/- 0.083  100%
+            beam-4        0.843 +/- 0.029  0.819 +/- 0.042   67%
+            nucleus 0.9   0.001 +/- 0.002  0.018 +/- 0.004   90%
+            Supersedes the 2026-09-10 run, whose shard predated the device
+            field and whose loop severity was measured on full-length text.
+            Nucleus reached the 256-token cap in 90% of generations - it did
+            not terminate early on gpt2 - while beam-4 stopped early in a
+            third. Lengths still differ across arms, so the fixed-prefix
+            control stands, but the reason given in the 2026-09-07
+            length-control entry ("nucleus terminates early") does not hold.

@@ -6,7 +6,7 @@ kwargs, the prompt stripping, or the tokenization — not in the metric.
 
     python -m src.generate --model gpt2 --seed 1234 --limit 30 \
         --arms greedy,beam4,nucleus0.9 --out outputs/sanity1.jsonl
-    python scripts/sanity1_repetition.py
+    PYTHONPATH=. python scripts/sanity1_repetition.py
 """
 from __future__ import annotations
 
