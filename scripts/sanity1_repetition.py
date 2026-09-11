@@ -87,8 +87,8 @@ def main() -> None:
     names = [LABELS[a] for a in ARMS]
 
     for ax, idx, title, ylab in (
-            (axes[0], 0, "Repetition", "rep-4 (first 128 tokens)"),
-            (axes[1], 2, "Loop severity", "longest repeat / length")):
+            (axes[0], 0, "Repetition (first 128 tokens)", "rep-4"),
+            (axes[1], 2, "Loop severity (first 128 tokens)", "longest repeat / length")):
         vals = [stats[a][idx] for a in ARMS]
         errs = [stats[a][idx + 1] for a in ARMS]
         ax.bar(x, vals, yerr=errs, capsize=5, color=ACCENT, width=0.62,
@@ -96,8 +96,9 @@ def main() -> None:
         ax.set_xticks(list(x))
         ax.set_xticklabels(names)
         ax.set_ylabel(ylab)
-        ax.set_title(title, color=INK)
-        ax.set_ylim(0, 1)
+        ax.set_title(title, color=INK, pad=12)
+        ax.set_ylim(0, 1.1)          # headroom: value labels sit above the bars
+        ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
         ax.grid(axis="y", color="#e2e2e2", linewidth=0.8)   # recessive grid
         ax.set_axisbelow(True)
         for s in ("top", "right"):
