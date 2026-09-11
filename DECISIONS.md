@@ -238,3 +238,9 @@ This file becomes the paper's Experimental Setup section.
             Half the 12.7 GB card, so the arm is viable at the largest scale.
             A full (model, seed) shard is ~4.5 h at that rate; GPT-2 shards
             measured 37 min at 0.41 cells/s.
+
+2026-09-11  Grid excludes node s-002.
+            torch.cuda.is_available() returns False there ("CUDA unknown
+            error") while s-003..s-006 work. Nine of nine shards landed on
+            s-002 and refused; the GPU guard caught it in 40 seconds instead
+            of producing an hour of CPU records.
