@@ -6,6 +6,9 @@
 #SBATCH --array=0-8%3
 #SBATCH --output=logs/gen_%A_%a.out
 #SBATCH --requeue
+# s-002 repeatedly fails CUDA initialisation ('CUDA unknown error'),
+# which the GPU guard catches but only after the shard is scheduled.
+#SBATCH --exclude=s-002
 
 # One task per (model, seed). Sharding is by model because loading
 # Llama-3.2-3B off the netapp share costs ~6 minutes; a finer shard would pay
