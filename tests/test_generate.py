@@ -149,3 +149,15 @@ def test_dola_arms_carry_the_remote_code_contract(arm):
     kw = kwargs_for(arm)
     assert kw["custom_generate"] == "transformers-community/dola"
     assert kw["trust_remote_code"] is True
+
+
+def test_dola_actually_contrasts_layers(gpt2_cpu):
+    """dola and greedy_reppen are identical in every kwarg except the layer
+    contrast: both deterministic, both repetition_penalty=1.2. If DoLa were
+    silently skipped - custom_generate ignored after a library bump, the way
+    transformers already mislabels output_hidden_states as ignorable - the two
+    would return the same text. A non-empty check cannot see that."""
+    tok, model = gpt2_cpu
+    dola = generate_one(tok, model, "dola", ENT, seed=1)["text"]
+    ctrl = generate_one(tok, model, "greedy_reppen", ENT, seed=1)["text"]
+    assert dola != ctrl
