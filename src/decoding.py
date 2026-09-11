@@ -74,8 +74,13 @@ ARMS: dict[str, dict[str, object]] = {
         "trust_remote_code": True,
         # Pin the repo explicitly rather than relying on the deprecation
         # shim, and ask for hidden states: the extracted implementation
-        # reads outputs.hidden_states, which 4.x used to request itself.
+        # requests hidden states itself.
         "custom_generate": "transformers-community/dola",
+        # Required, despite transformers warning that it "may be
+        # ignored": that validation pass does not know about
+        # custom_generate kwargs. Removing it reproduces
+        # TypeError: 'NoneType' object is not subscriptable in
+        # _dola_decoding, which reads outputs.hidden_states.
         "output_hidden_states": True,
         "repetition_penalty": 1.2,
     },
@@ -105,8 +110,13 @@ ARMS: dict[str, dict[str, object]] = {
         "trust_remote_code": True,
         # Pin the repo explicitly rather than relying on the deprecation
         # shim, and ask for hidden states: the extracted implementation
-        # reads outputs.hidden_states, which 4.x used to request itself.
+        # requests hidden states itself.
         "custom_generate": "transformers-community/dola",
+        # Required, despite transformers warning that it "may be
+        # ignored": that validation pass does not know about
+        # custom_generate kwargs. Removing it reproduces
+        # TypeError: 'NoneType' object is not subscriptable in
+        # _dola_decoding, which reads outputs.hidden_states.
         "output_hidden_states": True,
     },
 }

@@ -206,10 +206,35 @@ This file becomes the paper's Experimental Setup section.
             The first launch put five of nine shards on CPU after CUDA failed
             to initialise, and they were producing records silently. CPU
             records are RNG- and numerically incomparable with GPU ones, and a
-            3B shard would never finish. The array is also throttled to 4
+            3B shard would never finish. The array is also throttled to 3
             concurrent tasks to stop five jobs landing on one node.
 
-2026-09-10  Decoding uses clean_up_tokenization_spaces=False.
-            That post-processing targets WordPiece and is destructive for BPE,
-            stripping spaces before punctuation. Both generator families are
-            BPE, and the altered strings would feed every text metric.
+2026-09-10  Decoding passes clean_up_tokenization_spaces=False explicitly.
+            transformers already refuses that post-processing for BPE
+            tokenizers, and both generator families are BPE, so output was
+            byte-identical either way and no record was ever affected. Setting
+            it explicitly pins the behaviour across library versions rather
+            than relying on a default.
+
+2026-09-10  DoLa remote code pinned at revision
+            af6cdc351e7e0bd28a86ce32aac461494a09a9c1, pre-fetched with
+            snapshot_download; grid jobs run with HF_HUB_OFFLINE=1.
+            transformers rejects both `revision=` and `repo@sha` for
+            custom_generate, so pre-fetch plus offline is the only available
+            pin. It also guarantees no shard silently re-downloads the gated
+            Llama weights.
+
+2026-09-10  DoLa requires output_hidden_states=True despite transformers
+            warning that the flag "may be ignored".
+            That validation pass does not know about custom_generate kwargs.
+            Removing the flag reproduces TypeError: 'NoneType' object is not
+            subscriptable in _dola_decoding, which reads outputs.hidden_states.
+            Verified: dola and greedy_reppen — identical in every kwarg except
+            the layer contrast — produce different text, so DoLa is active and
+            not silently skipped.
+
+2026-09-10  DoLa cost on Llama-3.2-3B, measured: 6.5 GB peak GPU memory and
+            ~10 s per 256-token generation on a TITAN Xp.
+            Half the 12.7 GB card, so the arm is viable at the largest scale.
+            A full (model, seed) shard is ~4.5 h at that rate; GPT-2 shards
+            measured 37 min at 0.41 cells/s.
