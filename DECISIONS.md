@@ -261,3 +261,13 @@ This file becomes the paper's Experimental Setup section.
             third. Lengths still differ across arms, so the fixed-prefix
             control stands, but the reason given in the 2026-09-07
             length-control entry ("nucleus terminates early") does not hold.
+
+2026-09-12  hit_cap for sc_k5 is any() over its five sequences, so its cap rate
+            is not comparable to single-sequence arms and is reported
+            separately (or as a per-sequence mean) rather than in the same
+            column.
+
+2026-09-12  Measured per-arm means over all 8,100 records: cap rate ranges
+            40% (greedy_reppen) to 89% (greedy, temp1.3); mean generated
+            tokens 179-243. The length spread is why every length-sensitive
+            metric is also reported on a fixed 128-token prefix.
