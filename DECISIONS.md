@@ -271,3 +271,14 @@ This file becomes the paper's Experimental Setup section.
             40% (greedy_reppen) to 89% (greedy, temp1.3); mean generated
             tokens 179-243. The length spread is why every length-sensitive
             metric is also reported on a fixed 128-token prefix.
+
+2026-09-12  GATE 3 passed. Support rate falls monotonically with randomness
+            (greedy 0.151, temp0.7 0.112, temp1.3 0.022 on llama-1b dev) and
+            rises monotonically with entity popularity (stratum 0/1/2 =
+            0.040/0.125/0.190), reproducing FActScore's popularity effect.
+            p_entail is strongly bimodal (p50=0.018, p90=0.977), so theta is
+            not knife-edge: moving it from 0.15 to 0.95 reclassifies ~15% of
+            sentences. Absolute support rates are low because the stratified
+            sample deliberately includes obscure entities a 1B model cannot
+            recall — inspection confirms genuine fabrication, not verifier
+            failure.
