@@ -111,13 +111,7 @@ This file becomes the paper's Experimental Setup section.
             manual labels - never to maximise the gap between arms.
 
 ## Still open
-- Deduplicate repeated identical sentences before verifying, or not?
-  dedup = distinct-claim accuracy; no-dedup = token-weighted accuracy.
-  Very different numbers for greedy and beam - decide deliberately.
 - Entailment threshold theta          (tune on dev only)
-- dola_layers: "low" vs "high"        (tune on dev only)
-- Seeds (3 integers)
-- Dev/test split size — currently 20/80
 - SC selection embedder
 
 2026-09-07  dtype = torch.float16 for all three generator models.
@@ -282,3 +276,25 @@ This file becomes the paper's Experimental Setup section.
             sample deliberately includes obscure entities a 1B model cannot
             recall — inspection confirms genuine fabrication, not verifier
             failure.
+
+2026-09-12  Verifier dtype: fp16, measured rather than assumed.
+            57,783 sentence scores across 4,950 verdicts contain zero
+            non-finite values, range 0.0001-0.9998. DeBERTa-v3 has known fp16
+            overflow reports and the fluency scorer is deliberately fp32, so
+            this needed evidence, not a default.
+
+2026-09-12  Repeated identical sentences: decided.
+            verify.py scores every sentence and stores its p_entail, so both
+            variants are computable at analysis time with no re-verification.
+            Reported: distinct-claim (identical sentences collapsed) as the
+            primary number, token-weighted (every sentence counted) as a
+            secondary column. Token-weighted alone would flatter the
+            degenerate arms - greedy and beam-4 repeat one sentence many
+            times, and a biography's opening sentence is usually the one the
+            page supports, so a loop inflates their support rate in the
+            direction of our own hypothesis.
+
+2026-09-12  "Still open" pruned to what is actually open. Seeds (decided
+            2026-09-09), dola_layers (frozen "low", 2026-09-09) and the
+            20/80 split (2026-09-07) were listed as open while being decided
+            earlier in this same file.
