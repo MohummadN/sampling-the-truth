@@ -27,6 +27,7 @@ from src.generate import GIT_COMMIT, acquire_lock, append, release_lock
 from src.metrics.factuality import (NLI_NAME, RETRIEVER_NAME, THETA, TOP_M,
                                     WINDOW, build_index, entail_probs,
                                     load_nli, load_retriever, retrieve)
+from src.text import is_claim
 
 OUT_DIR = "outputs"
 
@@ -70,7 +71,10 @@ def main() -> None:
     for line in open(src):
         r = json.loads(line)
         for i, s in enumerate(r.get("sentences") or []):
-            if s.get("supported"):
+            # Only real claims. A title echo becomes a tautology once the
+            # entity prefix is prepended and is entailed by ANY page, which
+            # would report as genericity rather than measure it.
+            if s.get("supported") and is_claim(s["sentence"], r["entity"]):
                 work.append({
                     "decoding": r["decoding"], "entity": r["entity"],
                     "prompt_id": r["prompt_id"], "sent_index": i,
@@ -113,9 +117,15 @@ def main() -> None:
                 index = build_index(pages[w_ent], retriever)
                 cur = w_ent
 
+            # Retrieval uses the bare sentence, exactly as score_generation
+            # does. The HYPOTHESIS must carry the entity prefix, also exactly
+            # as score_generation does: only the evidence may differ between
+            # the two scorings. A bare sentence gives the wrong page nothing
+            # to contradict, which inflates the genericity rate.
             windows = retrieve(w["sentence"], index, retriever, TOP_M)
+            hyp = f"{w['entity']}: {w['sentence']}"
             kw = {"cache": cache} if _PASS_CACHE else {}
-            probs = entail_probs(windows, [w["sentence"]] * len(windows),
+            probs = entail_probs(windows, [hyp] * len(windows),
                                  tok, model, entail_id, **kw)
             p = max(probs) if probs else 0.0
 
@@ -128,6 +138,7 @@ def main() -> None:
                 "sentence": w["sentence"],
                 "p_entail_true": w["p_entail_true"],
                 "p_entail_wrong": p,
+                "hyp_form": "entity_prefixed",
                 "supported_wrong": bool(p >= args.theta),
                 "theta": args.theta, "top_m": TOP_M, "window": WINDOW,
                 "nli_model": NLI_NAME, "retriever": RETRIEVER_NAME,

@@ -21,3 +21,31 @@ def split_sentences(text: str, min_chars: int = MIN_CHARS) -> list[str]:
     """
     ensure_punkt()
     return [s.strip() for s in sent_tokenize(text) if len(s.strip()) >= min_chars]
+
+def is_claim(sentence: str, entity: str) -> bool:
+    """Is this sentence a checkable biographical claim?
+
+    The verifier scores every segment split_sentences returns, and three kinds
+    of segment are not claims at all. Counting them inflates support rate, and
+    unequally: 41% of GPT-2 beam4's supported sentences are non-claims against
+    2% of Llama-3b's, so cross-model comparison inherits the bias.
+
+      - the Wikipedia title echoed back ("Douglas Wood (engineer).") — a
+        tautology once the entity prefix is prepended, so it is entailed by
+        any page at all
+      - questions ("How did he become involved?") — assert nothing
+      - fragments the 256-token cap cut mid-sentence ("Jose Cardozo is"),
+        identified by having no terminal punctuation
+
+    Applied identically to every arm, and to both numerator and denominator.
+    """
+    s = (sentence or "").strip()
+    if not s:
+        return False
+    if s.endswith("?"):
+        return False
+    if not s.endswith((".", "!", '"', "'", "”")):
+        return False
+    core = s.rstrip(".").strip().lower()
+    e = (entity or "").strip().lower()
+    return core not in (e, e.split(" (")[0])
