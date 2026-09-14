@@ -361,3 +361,40 @@ re-verification.
 - **Degeneracy is reported as a three-way taxonomy** (repetition loops,
   unsegmentable run-ons, valid single sentences), not one opaque count. Only
   1 of 369 excluded records is empty.
+
+## Metric validity (14 September) — see docs/metric_validity.md
+
+Two threats measured from the existing verdicts; no re-generation, no
+re-verification pass.
+
+- **Pool-size artifact is real and bounded at ~0.01.** A ~7x larger evidence
+  pool buys ~+0.022 entailment probability on unsupported sentences (GPT-2
+  noise floor 0.0183 -> 0.0402 across strata). The sentences that could cross
+  theta = 0.5 are those in [0.4, 0.5): under 1% in every stratum, and falling
+  with pool size (0.64% / 0.98% / 0.19%). Against llama-1b's +0.227 stratum
+  effect the artifact is two orders of magnitude too small. The macro-rate
+  control (GPT-2 flat, +0.008) corroborates but is weak alone: 95% CI
+  [-0.114, +0.129].
+- **Reference coverage is NOT excluded** and cannot be by this design. The
+  stratum effect is "memorisation and/or coverage". The 100 manual labels are
+  drawn **stratified across the three strata**; the "true but absent from page"
+  rate per stratum bounds it directly.
+- **The equal-pool re-verification pass is cancelled** — truncating pages would
+  suppress pool size and coverage together, so shrinkage would be
+  uninterpretable.
+- **theta >= 0.5 for the stratum analysis.** The artifact lives in the 0.1-0.5
+  band. Stage 7 may tune theta for the headline metric, but the stratum effect
+  is additionally reported at a fixed theta = 0.5.
+- **Macro-average over prompts is primary.** Micro-averaging weights long
+  generations more and generation length varies by arm, letting a length
+  difference masquerade as a factuality difference. The paired bootstrap over
+  prompts requires the macro form.
+- **Paired tests run on the zeroed variant** (degenerate = 0.0) so all 900 pairs
+  survive; exclusion-based means are reported beside a coverage column,
+  FActScore style. Arm ordering is identical under both conventions. Caveat to
+  state: zeroing conflates "no scorable claims" with "all claims unsupported".
+- **MIN_CHARS stays at 15**; lowering it recovers ~15% of degenerates while
+  admitting "Yes." and "Ok." as claims.
+- **Degeneracy is reported as a three-way taxonomy** (repetition loops,
+  unsegmentable run-ons, valid single sentences), not one opaque count. Only
+  1 of 369 excluded records is empty.
