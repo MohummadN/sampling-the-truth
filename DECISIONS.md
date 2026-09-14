@@ -398,3 +398,12 @@ re-verification pass.
 - **Degeneracy is reported as a three-way taxonomy** (repetition loops,
   unsegmentable run-ons, valid single sentences), not one opaque count. Only
   1 of 369 excluded records is empty.
+
+## Genericity control (14 September) — see docs/metric_validity.md Problem 3
+
+All 10,012 supported sentences re-scored against a same-stratum wrong page. A
+sentence counts as adjusted-supported only if the true page entails it and the
+wrong page does not. Generic share of supported sentences under beam4: gpt2
+45.5%, llama-1b 10.6%, llama-3b 7.0% — GPT-2's beam4 lead collapses to its own
+greedy level (0.077 vs 0.074), while both Llamas retain theirs. Raw rate is the
+headline; **adjusted is primary for cross-model comparisons**.

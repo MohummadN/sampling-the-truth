@@ -21,6 +21,7 @@ raw = collections.defaultdict(list)
 adj = collections.defaultdict(list)
 gen_n = collections.Counter()
 gen_d = collections.Counter()
+missing = collections.Counter()
 
 for p in glob.glob("outputs/verdicts_*.jsonl"):
     for line in open(p):
@@ -37,12 +38,22 @@ for p in glob.glob("outputs/verdicts_*.jsonl"):
                 continue
             n_sup += 1
             gen_d[k] += 1
-            if wrong.get((r["model"], r["decoding"], r["seed"], r["entity"], i)):
+            kk = (r["model"], r["decoding"], r["seed"], r["entity"], i)
+            if kk not in wrong:
+                missing[k] += 1
+            if wrong.get(kk):
                 gen_n[k] += 1
             else:
                 n_adj += 1
         raw[k].append(n_sup / len(sents))
         adj[k].append(n_adj / len(sents))
+
+tot_d, tot_m = sum(gen_d.values()), sum(missing.values())
+cov = 1 - tot_m / tot_d if tot_d else 0
+print(f"mismatch coverage: {tot_d - tot_m}/{tot_d} supported sentences "
+      f"scored ({cov:.1%})\n")
+if cov < 0.99:
+    raise SystemExit("INCOMPLETE — wait for the mismatch array to finish")
 
 print(f"{'model':10s} {'arm':14s} {'n':>4s} {'raw':>7s} {'adjusted':>9s} "
       f"{'drop':>7s} {'generic %':>10s}")

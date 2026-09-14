@@ -300,3 +300,53 @@ bootstrap 95% interval of [-0.114, +0.129] (10,000 resamples, seed 0), bounding
 the artifact only at ~0.12. The band measurement is an order of magnitude
 tighter and does not depend on GPT-2 being free of a floor effect — which
 answers the objection this document raises against its own control.
+
+---
+
+## Problem 3 — is "supported" just generic prose? (14 September)
+
+### Method
+
+Every sentence the verifier marked supported (10,012 of them) was re-scored
+against a **different entity's page, drawn from the same stratum** so the
+evidence pool size is matched. A real fact about one person should not be
+entailed by another person's page. `scripts/mismatch_control.py`; deterministic
+same-stratum rotation, seed-free.
+
+Adjusted support rate counts a sentence only if the true page entails it AND
+the wrong page does not.
+
+### Evidence
+
+| model | arm | raw | adjusted | generic % |
+|---|---|---|---|---|
+| gpt2 | beam4 | 0.193 | 0.077 | **45.5** |
+| gpt2 | greedy | 0.110 | 0.074 | 17.6 |
+| gpt2 | nucleus0.9 | 0.015 | 0.012 | 25.5 |
+| llama-1b | beam4 | 0.289 | 0.256 | 10.6 |
+| llama-1b | greedy | 0.100 | 0.093 | 4.2 |
+| llama-1b | nucleus0.9 | 0.086 | 0.063 | 27.0 |
+| llama-3b | beam4 | 0.272 | 0.251 | **7.0** |
+| llama-3b | greedy | 0.105 | 0.101 | 2.8 |
+| llama-3b | nucleus0.9 | 0.085 | 0.064 | 23.5 |
+
+### Findings
+
+1. **GPT-2's beam-4 lead is largely genericity.** 45.5% of its supported
+   sentences fit a different person. Adjusted, beam4 (0.077) is level with
+   greedy (0.074) — the lead disappears.
+2. **The Llama beam-4 advantage is real**, losing only 10.6% and 7.0%.
+3. **Genericity falls monotonically with scale: 45.5 -> 10.6 -> 7.0.** Larger
+   models make more specific, more falsifiable claims. This explains GPT-2
+   scoring above 0.9 on obscure entities without invoking copying, which
+   `scripts/copy_check.py` had already excluded (max 8-gram overlap 0.061).
+4. **Sampling is the generic mode, not beam search.** For both Llamas,
+   nucleus0.9 loses 27.0% / 23.5% against greedy's 4.2% / 2.8%.
+
+### Consequence
+
+Raw support rate is the headline (FActScore-comparable); adjusted is reported
+beside it and is **primary for cross-model claims**, because genericity varies
+systematically with scale and raw rates are not comparable across models
+without it. Noise caveat: generic % for GPT-2's weakest arms rests on few
+supported sentences.
