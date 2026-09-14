@@ -121,6 +121,13 @@ ARMS: dict[str, dict[str, object]] = {
     },
 }
 
+# Dev-only sensitivity arms (Stage 6). Identical to their parents except for
+# dola_layers, so any difference isolates the layer-selection choice alone.
+# Not part of the frozen 8,100-record grid: run on the 20 dev entities with
+# --arms dola_high,dola_nucleus_high --split dev --out outputs/dolasweep_*.jsonl
+ARMS["dola_high"] = {**ARMS["dola"], "dola_layers": "high"}
+ARMS["dola_nucleus_high"] = {**ARMS["dola_nucleus"], "dola_layers": "high"}
+
 
 DESCRIBE_FIELDS = (
     "do_sample",
