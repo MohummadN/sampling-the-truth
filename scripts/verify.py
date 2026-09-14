@@ -9,7 +9,12 @@ lock-protected — the same contract as generation, for the same reason: these
 jobs get pre-empted.
 
 sc_k5 records are skipped: their `text` is null until the self-consistency
-selector runs. Verify them in a second pass afterwards.
+selector runs. The second pass verifies all five samples per entity via
+--src/--out:
+
+    python -m scripts.verify --model gpt2 --seed 1234 \
+        --src outputs/scsel_gpt2_seed1234.jsonl \
+        --out outputs/scverdicts_gpt2_seed1234.jsonl
 """
 from __future__ import annotations
 
@@ -37,12 +42,16 @@ def main() -> None:
     ap.add_argument("--arms", default=None, help="comma-separated; default all")
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--theta", type=float, default=THETA)
+    ap.add_argument("--src", default=None,
+                    help="input shard path (default: outputs/gen_{model}_seed{seed}.jsonl)")
+    ap.add_argument("--out", default=None,
+                    help="verdicts path (default: outputs/verdicts_{model}_seed{seed}.jsonl)")
     ap.add_argument("--details", action="store_true", default=True,
                     help="store per-sentence evidence (needed for the manual check)")
     args = ap.parse_args()
 
-    src = f"{OUT_DIR}/gen_{args.model}_seed{args.seed}.jsonl"
-    out = f"{OUT_DIR}/verdicts_{args.model}_seed{args.seed}.jsonl"
+    src = args.src or f"{OUT_DIR}/gen_{args.model}_seed{args.seed}.jsonl"
+    out = args.out or f"{OUT_DIR}/verdicts_{args.model}_seed{args.seed}.jsonl"
     if not os.path.exists(src):
         raise SystemExit(f"{src} not found")
 

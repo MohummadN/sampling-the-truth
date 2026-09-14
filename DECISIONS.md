@@ -298,3 +298,66 @@ This file becomes the paper's Experimental Setup section.
             2026-09-09), dola_layers (frozen "low", 2026-09-09) and the
             20/80 split (2026-09-07) were listed as open while being decided
             earlier in this same file.
+
+2026-09-12  Verification complete. Support rate by model, mean over 3 seeds:
+            gpt2 0.063 (+/-0.003), llama-1b 0.117 (+/-0.005), llama-3b 0.130
+            (+/-0.004). Monotone in scale, with seed spread an order of
+            magnitude below the between-model gaps. 124M->1B roughly doubles
+            support; 1B->3B adds ~0.013, i.e. diminishing returns at small
+            scale. Degenerate generations (<2 sentences): gpt2 ~8%, Llama 3-5%.
+
+## Sentence deduplication: measured, rejected (14 September)
+
+Repeated identical sentences are **not** collapsed before verification.
+`scripts/dedup_probe.py` recomputes support rate over unique sentences across
+all 7,200 verdicts. Every arm shifts by <= 0.026, and the shifts are *negative*
+(raw below dedup): repeated sentences are disproportionately unsupported, so
+repetition deflates the score rather than inflating it. The pre-registered
+worry — that beam4's high support rate was repetition inflation — is therefore
+wrong in sign.
+
+Raw is kept as the headline metric: FActScore scores every atomic claim, a
+model that emits a claim ten times has made ten claims, and deduplicating would
+remove degeneracy from the factuality axis, which is the tradeoff under study.
+The dedup table is reported as a robustness check.
+
+Duplicate-sentence fraction, mean per arm: greedy 0.597, beam4 0.505,
+dola_nucleus 0.240, dola 0.082, temp0.7 0.079, nucleus0.9 0.013, temp1.3 0.000,
+greedy_reppen 0.000. The repetition-penalty control eliminates exact sentence
+repeats entirely, establishing that the repetition is a decoding artifact.
+
+## Metric validity (14 September) — see docs/metric_validity.md
+
+Two threats measured from the existing verdicts; no re-generation, no
+re-verification.
+
+- **Pool-size artifact is real but bounded.** A ~7x larger evidence pool buys
+  ~+0.022 entailment probability on unsupported sentences (GPT-2 noise floor
+  0.0183 -> 0.0402 across strata). GPT-2's macro rate moves +0.007 across the
+  same pools while Llama-1b moves +0.227. Reported as bounded, not excluded:
+  GPT-2's difference carries a 95% interval of roughly +-0.11.
+- **Reference coverage is NOT excluded** and cannot be by this design. The
+  stratum effect is "memorisation and/or coverage". The 100 manual labels are
+  therefore drawn **stratified across the three strata**, and the
+  "true but absent from page" rate per stratum bounds it directly.
+- **The equal-pool re-verification pass is cancelled** — truncating pages would
+  suppress pool size and coverage together, so shrinkage would be
+  uninterpretable.
+- **theta >= 0.5 for the stratum analysis.** The artifact lives in the 0.1-0.5
+  band, which grows with pool size. Stage 7 may tune theta for the headline
+  metric, but the stratum effect is additionally reported at a fixed
+  theta = 0.5.
+- **Macro-average over prompts is primary.** Micro-averaging weights long
+  generations more and generation length varies by arm, letting a length
+  difference masquerade as a factuality difference. The paired bootstrap over
+  prompts requires the macro form.
+- **Paired tests run on the zeroed variant** (degenerate = 0.0 support) so all
+  900 pairs survive; exclusion-based means are reported beside a coverage
+  column, FActScore style. Arm ordering is identical under both conventions.
+  Caveat to state: zeroing conflates "no scorable claims" with "all claims
+  unsupported".
+- **MIN_CHARS stays at 15**; lowering it recovers ~15% of degenerates while
+  admitting "Yes." and "Ok." as claims.
+- **Degeneracy is reported as a three-way taxonomy** (repetition loops,
+  unsegmentable run-ons, valid single sentences), not one opaque count. Only
+  1 of 369 excluded records is empty.
