@@ -10,6 +10,8 @@ import glob
 import json
 import statistics as st
 
+from src.text import is_claim
+
 wrong = {}
 for p in glob.glob("outputs/mismatch_*.jsonl"):
     for line in open(p):
@@ -32,8 +34,14 @@ for p in glob.glob("outputs/verdicts_*.jsonl"):
             raw[k].append(0.0)
             adj[k].append(0.0)
             continue
-        n_sup = n_adj = 0
+        n_sup = n_adj = n_claims = 0
         for i, s in enumerate(sents):
+            # Skip inside the loop, never filter the list: i IS the sent_index
+            # the control recorded, so re-indexing would break the join and
+            # report every row as missing.
+            if not is_claim(s["sentence"], r["entity"]):
+                continue
+            n_claims += 1
             if not s.get("supported"):
                 continue
             n_sup += 1
@@ -45,8 +53,8 @@ for p in glob.glob("outputs/verdicts_*.jsonl"):
                 gen_n[k] += 1
             else:
                 n_adj += 1
-        raw[k].append(n_sup / len(sents))
-        adj[k].append(n_adj / len(sents))
+        raw[k].append(n_sup / n_claims if n_claims else 0.0)
+        adj[k].append(n_adj / n_claims if n_claims else 0.0)
 
 tot_d, tot_m = sum(gen_d.values()), sum(missing.values())
 cov = 1 - tot_m / tot_d if tot_d else 0
