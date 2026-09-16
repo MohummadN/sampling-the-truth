@@ -27,6 +27,7 @@ import random
 import re
 
 from src.data import load_entities
+from src.text import is_claim
 
 SEED = 20260914
 BANDS = [(0.0, 0.1, "lo"), (0.1, 0.5, "mid_lo"),
@@ -43,14 +44,27 @@ def band_of(p):
 
 
 def main():
-    strat = {e["entity"]: e["stratum"] for e in load_entities()}
+    ents = load_entities()
+    strat = {e["entity"]: e["stratum"] for e in ents}
+    # DEV ONLY. theta is chosen to maximise agreement with these labels
+    # (DECISIONS.md, 2026-09-07: all tuning happens on the 20 dev entities,
+    # only the 80 test are reported). Drawing them from test would tune theta
+    # on test and the reported numbers would no longer be held out.
+    dev = {e["entity"] for e in ents if e["split"] == "dev"}
     frame = collections.defaultdict(list)
 
     for path in sorted(glob.glob("outputs/verdicts_*.jsonl")):
         for line in open(path):
             r = json.loads(line)
+            if r["entity"] not in dev:
+                continue
             seen = set()
             for i, s in enumerate(r.get("sentences") or []):
+                # Non-claims (title echoes, questions, truncation fragments)
+                # would burn the 100-label budget on segments that assert
+                # nothing. Same filter the metric uses.
+                if not is_claim(s["sentence"], r["entity"]):
+                    continue
                 norm = WS.sub(" ", s["sentence"].strip().lower())
                 if norm in seen:          # a repetition loop contributes once
                     continue
