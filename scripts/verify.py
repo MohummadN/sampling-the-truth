@@ -25,6 +25,7 @@ import signal
 import time
 
 from src.data import load_entities, load_pages
+from src.device import pick_device
 from src.generate import (GIT_COMMIT, acquire_lock, append, load_done,
                           release_lock)
 from src.metrics.factuality import (NLI_NAME, RETRIEVER_NAME, THETA, TOP_M,
@@ -42,12 +43,15 @@ def main() -> None:
     ap.add_argument("--arms", default=None, help="comma-separated; default all")
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--theta", type=float, default=THETA)
+    ap.add_argument("--allow-cpu", action="store_true",
+                    help="debugging only; never for grid shards")
     ap.add_argument("--src", default=None,
                     help="input shard path (default: outputs/gen_{model}_seed{seed}.jsonl)")
     ap.add_argument("--out", default=None,
                     help="verdicts path (default: outputs/verdicts_{model}_seed{seed}.jsonl)")
-    ap.add_argument("--details", action="store_true", default=True,
-                    help="store per-sentence evidence (needed for the manual check)")
+    ap.add_argument("--no-details", dest="details", action="store_false",
+                    help="drop per-sentence evidence; it is what makes theta\n"
+                         "re-tunable without re-running, so keep it on")
     args = ap.parse_args()
 
     src = args.src or f"{OUT_DIR}/gen_{args.model}_seed{args.seed}.jsonl"
@@ -83,6 +87,13 @@ def main() -> None:
         if not todo:
             return
 
+        # Checked before loading. fp16 runs on CPU too, just far slower, so
+        # nothing would crash - the grid already lost five shards that way.
+        if pick_device() != "cuda" and not args.allow_cpu:
+            raise SystemExit(
+                "refusing to run on cpu: verdicts must be comparable with "
+                "the rest of the grid. Resubmit this array index.")
+
         pages = load_pages()
         tok, model, entail_id = load_nli()
         retriever = load_retriever()
@@ -110,6 +121,7 @@ def main() -> None:
                 "degenerate": res["degenerate"],
                 "sentences": res["sentences"] if args.details else None,
                 "nli_model": NLI_NAME, "retriever": RETRIEVER_NAME,
+                "device": str(model.device),
                 "theta": args.theta, "top_m": TOP_M, "window": WINDOW,
                 "git_commit": GIT_COMMIT,
             }

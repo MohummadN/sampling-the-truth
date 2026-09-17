@@ -161,3 +161,17 @@ def test_dola_actually_contrasts_layers(gpt2_cpu):
     dola = generate_one(tok, model, "dola", ENT, seed=1)["text"]
     ctrl = generate_one(tok, model, "greedy_reppen", ENT, seed=1)["text"]
     assert dola != ctrl
+
+
+def test_git_commit_survives_a_node_without_git(monkeypatch):
+    """git is not installed on every compute node - s-004 has it, s-003 and
+    s-006 do not - and the subprocess failure silently cost all 4,950 verdicts
+    of the first verification pass their provenance. The fallback reads
+    .git/HEAD directly."""
+    import subprocess
+
+    from src.generate import _git_commit
+    truth = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    assert _git_commit() == truth
+    monkeypatch.setenv("PATH", "")          # no git binary anywhere
+    assert _git_commit() == truth

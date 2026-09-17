@@ -50,7 +50,26 @@ def _git_commit() -> str:
             cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
             text=True, stderr=subprocess.DEVNULL).strip()
     except Exception:
-        return "unknown"
+        pass
+    # Not every compute node has git: s-004 does, s-003 and s-006 do not, and
+    # the whole first verification pass lost its provenance to that. Read the
+    # ref out of .git rather than letting a missing binary cost us the field.
+    try:
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        head = open(os.path.join(root, ".git", "HEAD")).read().strip()
+        if not head.startswith("ref: "):
+            return head                     # detached HEAD is already a sha
+        ref = head[5:]
+        loose = os.path.join(root, ".git", ref)
+        if os.path.exists(loose):
+            return open(loose).read().strip()
+        with open(os.path.join(root, ".git", "packed-refs")) as f:
+            for line in f:
+                if line.rstrip().endswith(" " + ref):
+                    return line.split()[0]
+    except Exception:
+        pass
+    return "unknown"
 
 
 # Resolved once at import: a subprocess per record costs ~25 ms x 8,100 records

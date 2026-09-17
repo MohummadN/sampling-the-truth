@@ -129,23 +129,31 @@ def entail_probs(premises: list[str], hypotheses: list[str],
     # Degenerate arms repeat the same sentence dozens of times, so the same
     # (premise, hypothesis) pair recurs constantly. Caching is the difference
     # between scoring greedy once and scoring it fifty times.
-    todo = [i for i, (p_, h_) in enumerate(zip(premises, hypotheses))
-            if cache is None or (p_, h_) not in cache]
+    pairs = list(zip(premises, hypotheses))
+    local: dict[tuple, float] = {}
 
-    fresh: dict[int, float] = {}
-    for i in range(0, len(todo), batch_size):
-        idx = todo[i:i + batch_size]
-        enc = tok([premises[j] for j in idx], [hypotheses[j] for j in idx],
+    def known(pair):
+        if cache is not None and pair in cache:
+            return cache[pair]
+        return local.get(pair)
+
+    # dict.fromkeys keeps order and drops repeats WITHIN this call too. Scoring
+    # by index deduplicated only across calls, so a greedy generation repeating
+    # one sentence forty times was scored forty times.
+    need = list(dict.fromkeys(p for p in pairs if known(p) is None))
+
+    for i in range(0, len(need), batch_size):
+        batch = need[i:i + batch_size]
+        enc = tok([p for p, _ in batch], [h for _, h in batch],
                   return_tensors="pt", padding=True,
                   truncation="only_first", max_length=MAX_LEN).to(model.device)
-        p = model(**enc).logits.float().softmax(-1)[:, entail_id].tolist()
-        for j, v in zip(idx, p):
-            fresh[j] = v
+        probs = model(**enc).logits.float().softmax(-1)[:, entail_id].tolist()
+        for pair, v in zip(batch, probs):
+            local[pair] = v
             if cache is not None:
-                cache[(premises[j], hypotheses[j])] = v
+                cache[pair] = v
 
-    return [fresh[i] if i in fresh else cache[(premises[i], hypotheses[i])]
-            for i in range(len(premises))]
+    return [known(p) for p in pairs]
 
 
 # ------------------------------------------------------------------- scoring

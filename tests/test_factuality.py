@@ -97,3 +97,63 @@ def test_support_rate_is_a_fraction(nli, retriever):
     assert r["n_sentences"] == 3
     assert 0.0 <= r["support_rate"] <= 1.0
     assert r["support_rate"] < 1.0          # the Olympic claim must fail
+
+def test_entail_probs_dedups_within_one_call():
+    """A degenerate generation repeats one sentence, so the same
+    (premise, hypothesis) pair recurs many times in a single call. Scoring by
+    index deduplicated only ACROSS calls, so those were scored every time."""
+    import torch
+
+    calls = {"n": 0}
+
+    class Enc(dict):
+        def to(self, *_):
+            return self
+
+    class Tok:
+        def __call__(self, prem, hyp, **kw):
+            return Enc(prem=list(prem), hyp=list(hyp))
+
+    class Model:
+        device = "cpu"
+
+        def __call__(self, prem, hyp):
+            calls["n"] += len(prem)
+            return type("O", (), {"logits": torch.tensor(
+                [[0.0, abs(hash((p, h))) % 1000 / 100.0] for p, h in zip(prem, hyp)])})()
+
+    prem = ["e1", "e2"] * 20
+    hyp = ["the same claim"] * 40
+    got = entail_probs(prem, hyp, Tok(), Model(), 1, cache={})
+    assert calls["n"] == 2, f"scored {calls['n']} pairs, only 2 are distinct"
+    assert len(got) == 40 and got[0] == got[2]
+
+
+def test_entail_probs_cache_does_not_change_values():
+    """The cache is an optimisation. If it ever changes a score, every
+    factuality number silently depends on evaluation order."""
+    import torch
+
+    class Enc(dict):
+        def to(self, *_):
+            return self
+
+    class Tok:
+        def __call__(self, prem, hyp, **kw):
+            return Enc(prem=list(prem), hyp=list(hyp))
+
+    class Model:
+        device = "cpu"
+
+        def __call__(self, prem, hyp):
+            return type("O", (), {"logits": torch.tensor(
+                [[0.0, abs(hash((p, h))) % 1000 / 100.0] for p, h in zip(prem, hyp)])})()
+
+    prem = ["e1", "e2", "e1", "e3"]
+    hyp = ["c1", "c1", "c1", "c2"]
+    tok, model = Tok(), Model()
+    without = entail_probs(prem, hyp, tok, model, 1)
+    shared = {}
+    cold = entail_probs(prem, hyp, tok, model, 1, cache=shared)
+    warm = entail_probs(prem, hyp, tok, model, 1, cache=shared)
+    assert without == cold == warm
