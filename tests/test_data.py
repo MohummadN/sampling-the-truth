@@ -51,3 +51,21 @@ def test_different_seed_gives_a_different_sample():
     b = {c["entity"] for c in build_entities(seed=1)}
     assert a != b
     
+
+def test_reported_entities_defaults_to_test():
+    """DECISIONS 2026-09-07: the grid runs on all 100 but only the 80 test
+    entities are reported. A reported table that quietly included the 20 we
+    tuned theta on would not be held out."""
+    from src.data import reported_entities
+    assert len(reported_entities("test")) == 80
+    assert len(reported_entities("dev")) == 20
+    assert len(reported_entities("all")) == 100
+    assert not (reported_entities("dev") & reported_entities("test"))
+
+
+def test_reported_entities_honours_the_env_override(monkeypatch):
+    from src.data import reported_entities
+    monkeypatch.setenv("SPLIT", "dev")
+    assert len(reported_entities()) == 20
+    monkeypatch.delenv("SPLIT")
+    assert len(reported_entities()) == 80
