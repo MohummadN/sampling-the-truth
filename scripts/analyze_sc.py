@@ -11,18 +11,28 @@ Degenerate samples score 0.0, per the zeroed convention in DECISIONS.md.
 import collections
 import glob
 import json
+import os
 import statistics as st
+
+from src.data import reported_entities
+
+SPLIT = os.environ.get("SPLIT", "test")
+KEEP = reported_entities()
 
 sel = {}
 for p in glob.glob("outputs/scchoice_*.jsonl"):
     for line in open(p):
         r = json.loads(line)
+        if r["entity"] not in KEEP:
+            continue
         sel[(r["model"], r["seed"], r["entity"])] = r["selected_index"]
 
 rates = collections.defaultdict(dict)
 for p in glob.glob("outputs/scverdicts_*.jsonl"):
     for line in open(p):
         r = json.loads(line)
+        if r["entity"] not in KEEP:
+            continue
         j = int(r["decoding"].split("#")[1])
         v = r["support_rate"]
         rates[(r["model"], r["seed"], r["entity"])][j] = 0.0 if v is None else v
@@ -48,6 +58,7 @@ for k, d in rates.items():
     o["oracle"].append(max(v))
     o["worst"].append(min(v))
 
+print(f"reporting split: {SPLIT} ({len(KEEP)} entities)")
 print(f"entities with fewer than 5 scored samples: {incomplete}")
 print(f"entities dropped for a missing selection: {no_selection}\n")
 hdr = f"{'model':10s} {'n':>4s} {'pool':>7s} {'sc':>7s} {'oracle':>7s} {'worst':>7s} {'sc-pool':>8s} {'headroom':>9s}"

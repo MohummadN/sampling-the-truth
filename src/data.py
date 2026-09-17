@@ -121,6 +121,24 @@ def load_entities(path: str = ENTITIES_JSON) -> list[dict]:
         return json.load(f)
 
 
+def reported_entities(split: str | None = None) -> set[str]:
+    """The entities whose numbers may appear in the paper.
+
+    DECISIONS 2026-09-07: the grid runs on all 100, but only the 80 test
+    entities are reported - we tune theta, dola_layers, nucleus p and min_chars
+    on the other 20. Every analysis script filters through this, so a reported
+    table cannot quietly include the entities we tuned on.
+
+    Override with the SPLIT environment variable: SPLIT=dev for tuning
+    diagnostics, SPLIT=all to see the whole grid.
+    """
+    want = split or os.environ.get("SPLIT", "test")
+    ents = load_entities()
+    if want == "all":
+        return {e["entity"] for e in ents}
+    return {e["entity"] for e in ents if e["split"] == want}
+
+
 def dataset_stats(entities: list[dict] | None = None) -> str:
     """The graded dataset-statistics table (guidelines: Methodology).
 

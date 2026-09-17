@@ -417,3 +417,14 @@ collapse to greedy's level, it inverts**: adjusted beam4 0.043 against greedy
 to second. Both Llamas keep beam4 first (0.222, 0.241). Raw rate is the
 headline; **adjusted is primary for cross-model comparisons**, because
 genericity varies systematically with scale.
+
+2026-09-17  Analysis scripts report the 80 test entities by default.
+            DECISIONS 2026-09-07 says only the 80 are reported, but
+            analyze_mismatch, compute_frontier, analyze_sc and copy_check were
+            all averaging over all 100 - including the 20 we tune theta,
+            dola_layers, nucleus p and min_chars on. They now filter through
+            src.data.reported_entities(); SPLIT=dev or SPLIT=all overrides it
+            for diagnostics, and every script prints which split it reported.
+            Numbers produced before this change were over all 100 and must be
+            regenerated before they go in the paper.
+

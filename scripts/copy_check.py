@@ -9,14 +9,17 @@ measuring memorisation, not factual generation.
 import collections
 import glob
 import json
+import os
 import statistics as st
 
-from src.data import load_pages
+from src.data import load_pages, reported_entities
 # One tokenizer in the project, same rule as the diversity metrics. A second
 # copy here would drift the moment either is changed.
 from src.metrics.diversity import tokenize_words
 
 N = 8
+SPLIT = os.environ.get("SPLIT", "test")
+KEEP = reported_entities()
 
 
 def grams(t, n=N):
@@ -33,7 +36,7 @@ for path in glob.glob("outputs/verdicts_*.jsonl"):
     for line in open(path):
         r = json.loads(line)
         pg = page_grams.get(r["entity"])
-        if not pg or not r.get("sentences"):
+        if not pg or not r.get("sentences") or r["entity"] not in KEEP:
             continue
         for s in r["sentences"]:
             g = grams(tokenize_words(s["sentence"]))
@@ -43,6 +46,7 @@ for path in glob.glob("outputs/verdicts_*.jsonl"):
             acc[(r["model"], r["decoding"], bool(s["supported"]))].append(
                 len(g & pg) / len(g))
 
+print(f"reporting split: {SPLIT} ({len(KEEP)} entities)")
 print(f"sentences under {N} words, skipped: {short}\n")
 print(f"{'model':10s} {'arm':14s} {'supported':>10s} {'unsupported':>12s} {'gap':>7s}")
 print("-" * 58)

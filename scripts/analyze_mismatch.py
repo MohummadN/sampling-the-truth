@@ -8,9 +8,14 @@ the share of each arm's 'facts' that are generic enough to fit anyone.
 import collections
 import glob
 import json
+import os
 import statistics as st
 
+from src.data import reported_entities
 from src.text import is_claim
+
+SPLIT = os.environ.get("SPLIT", "test")
+KEEP = reported_entities()
 
 wrong = {}
 for p in glob.glob("outputs/mismatch_*.jsonl"):
@@ -28,6 +33,8 @@ missing = collections.Counter()
 for p in glob.glob("outputs/verdicts_*.jsonl"):
     for line in open(p):
         r = json.loads(line)
+        if r["entity"] not in KEEP:
+            continue
         k = (r["model"], r["decoding"])
         sents = r.get("sentences")
         if not sents:
@@ -58,6 +65,7 @@ for p in glob.glob("outputs/verdicts_*.jsonl"):
 
 tot_d, tot_m = sum(gen_d.values()), sum(missing.values())
 cov = 1 - tot_m / tot_d if tot_d else 0
+print(f"reporting split: {SPLIT} ({len(KEEP)} entities)")
 print(f"mismatch coverage: {tot_d - tot_m}/{tot_d} supported sentences "
       f"scored ({cov:.1%})\n")
 if cov < 0.99:
