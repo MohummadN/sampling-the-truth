@@ -29,17 +29,27 @@ for p in glob.glob("outputs/scverdicts_*.jsonl"):
 
 out = collections.defaultdict(lambda: collections.defaultdict(list))
 incomplete = 0
+no_selection = 0
 for k, d in rates.items():
     if len(d) < 5:
         incomplete += 1
-    v = [d[j] for j in sorted(d)]
+    j = sel.get(k)
+    if j is None or j not in d:
+        # A missing selection used to score 0.0, which silently depressed the
+        # sc column and made the selector look worse than the pool. Drop the
+        # entity instead: pool/sc/oracle/worst must describe the same entities
+        # or the comparison between them is meaningless.
+        no_selection += 1
+        continue
+    v = [d[i] for i in sorted(d)]
     o = out[k[0]]
     o["pool"].append(st.mean(v))
-    o["sc"].append(d.get(sel.get(k), 0.0))
+    o["sc"].append(d[j])
     o["oracle"].append(max(v))
     o["worst"].append(min(v))
 
-print(f"entities with fewer than 5 scored samples: {incomplete}\n")
+print(f"entities with fewer than 5 scored samples: {incomplete}")
+print(f"entities dropped for a missing selection: {no_selection}\n")
 hdr = f"{'model':10s} {'n':>4s} {'pool':>7s} {'sc':>7s} {'oracle':>7s} {'worst':>7s} {'sc-pool':>8s} {'headroom':>9s}"
 print(hdr)
 print("-" * len(hdr))

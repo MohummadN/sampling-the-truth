@@ -9,17 +9,14 @@ measuring memorisation, not factual generation.
 import collections
 import glob
 import json
-import re
 import statistics as st
 
 from src.data import load_pages
+# One tokenizer in the project, same rule as the diversity metrics. A second
+# copy here would drift the moment either is changed.
+from src.metrics.diversity import tokenize_words
 
-WORD = re.compile(r"[^\W_]+(?:'[^\W_]+)*")
 N = 8
-
-
-def toks(s):
-    return WORD.findall(s.lower())
 
 
 def grams(t, n=N):
@@ -27,7 +24,7 @@ def grams(t, n=N):
 
 
 pages = load_pages()
-page_grams = {e: grams(toks(" ".join(p) if isinstance(p, list) else p))
+page_grams = {e: grams(tokenize_words(" ".join(p) if isinstance(p, list) else p))
               for e, p in pages.items()}
 
 acc = collections.defaultdict(list)
@@ -39,7 +36,7 @@ for path in glob.glob("outputs/verdicts_*.jsonl"):
         if not pg or not r.get("sentences"):
             continue
         for s in r["sentences"]:
-            g = grams(toks(s["sentence"]))
+            g = grams(tokenize_words(s["sentence"]))
             if not g:
                 short += 1
                 continue
