@@ -307,41 +307,72 @@ answers the objection this document raises against its own control.
 
 ### Method
 
-Every sentence the verifier marked supported (10,012 of them) was re-scored
-against a **different entity's page, drawn from the same stratum** so the
-evidence pool size is matched. A real fact about one person should not be
+Every **claim-like** sentence the verifier marked supported (8,162 of them) was
+re-scored against a **different entity's page, drawn from the same stratum** so
+the evidence pool size is matched. A real fact about one person should not be
 entailed by another person's page. `scripts/mismatch_control.py`; deterministic
 same-stratum rotation, seed-free.
 
 Adjusted support rate counts a sentence only if the true page entails it AND
 the wrong page does not.
 
+**Corrected 17 September; the first run of this control was invalid.** Two
+faults, both found by inspecting what the control was actually comparing:
+
+1. **The hypothesis did not match the verifier's.** `score_generation` scores
+   `"{entity}: {sentence}"`; the control scored the bare sentence. The two
+   probabilities were therefore never comparable. Fixing it moved GPT-2 beam4
+   genericity 45.5% -> 66.1% on one shard, and the entire swing came from
+   name-bearing sentences (bare names +0.970, no-name sentences -0.012).
+2. **Non-claims were being scored as claims.** A Wikipedia title echoed back
+   ("Douglas Wood (engineer).") becomes a tautology once the entity prefix is
+   prepended, so *any* page entails it. 41% of GPT-2 beam4's supported
+   sentences were non-claims (title echoes, questions, truncation fragments)
+   against 2% of Llama-3b's, so the bias was strongly model-dependent.
+   `src.text.is_claim` now excludes them from both numerator and denominator,
+   identically for every arm.
+
+The raw column below is therefore over a **claim-only denominator** and is not
+comparable term-for-term with the superseded table.
+
 ### Evidence
+
+Coverage 8,162/8,162 claim-like supported sentences. n = 300 per row.
 
 | model | arm | raw | adjusted | generic % |
 |---|---|---|---|---|
-| gpt2 | beam4 | 0.193 | 0.077 | **45.5** |
-| gpt2 | greedy | 0.110 | 0.074 | 17.6 |
-| gpt2 | nucleus0.9 | 0.015 | 0.012 | 25.5 |
-| llama-1b | beam4 | 0.289 | 0.256 | 10.6 |
-| llama-1b | greedy | 0.100 | 0.093 | 4.2 |
-| llama-1b | nucleus0.9 | 0.086 | 0.063 | 27.0 |
-| llama-3b | beam4 | 0.272 | 0.251 | **7.0** |
-| llama-3b | greedy | 0.105 | 0.101 | 2.8 |
-| llama-3b | nucleus0.9 | 0.085 | 0.064 | 23.5 |
+| gpt2 | beam4 | 0.174 | **0.043** | **58.4** |
+| gpt2 | greedy | 0.120 | **0.085** | 33.3 |
+| gpt2 | dola_nucleus | 0.031 | 0.012 | 54.8 |
+| gpt2 | nucleus0.9 | 0.010 | 0.007 | 20.7 |
+| llama-1b | beam4 | 0.272 | 0.222 | 16.8 |
+| llama-1b | greedy | 0.094 | 0.092 | 0.9 |
+| llama-1b | nucleus0.9 | 0.073 | 0.066 | 10.2 |
+| llama-3b | beam4 | 0.263 | 0.241 | **6.3** |
+| llama-3b | greedy | 0.095 | 0.091 | 1.8 |
+| llama-3b | nucleus0.9 | 0.069 | 0.061 | 16.5 |
 
 ### Findings
 
-1. **GPT-2's beam-4 lead is largely genericity.** 45.5% of its supported
-   sentences fit a different person. Adjusted, beam4 (0.077) is level with
-   greedy (0.074) — the lead disappears.
-2. **The Llama beam-4 advantage is real**, losing only 10.6% and 7.0%.
-3. **Genericity falls monotonically with scale: 45.5 -> 10.6 -> 7.0.** Larger
+1. **GPT-2's beam-4 lead does not merely shrink — it inverts.** 58.4% of its
+   supported claims fit a different person. Adjusted, beam4 falls to 0.043
+   while greedy holds 0.085: greedy becomes the more factual arm by 2x, and
+   beam4 drops from first to second within GPT-2. The superseded table
+   reported this as "level with greedy", which understated it.
+2. **The Llama beam-4 advantage is real**, losing 16.8% and 6.3%, and beam4
+   stays first in both models under either convention.
+3. **Genericity falls monotonically with scale: 58.4 -> 16.8 -> 6.3.** Larger
    models make more specific, more falsifiable claims. This explains GPT-2
    scoring above 0.9 on obscure entities without invoking copying, which
    `scripts/copy_check.py` had already excluded (max 8-gram overlap 0.061).
-4. **Sampling is the generic mode, not beam search.** For both Llamas,
-   nucleus0.9 loses 27.0% / 23.5% against greedy's 4.2% / 2.8%.
+4. **Sampling is consistently more generic than greedy, but it is not the most
+   generic mode.** nucleus0.9 loses 10.2% / 16.5% against greedy's 0.9% / 1.8%
+   on the Llamas — but beam4 is more generic than nucleus for gpt2 (58.4 vs
+   20.7) and llama-1b (16.8 vs 10.2), and less so only for llama-3b (6.3 vs
+   16.5). The superseded claim that sampling, not beam search, is the generic
+   mode does not survive the correction.
+5. **`dola_nucleus` is the second-most generic GPT-2 arm** at 54.8%, dropping
+   from 3rd to 6th place once adjusted.
 
 ### Consequence
 
