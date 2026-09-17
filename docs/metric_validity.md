@@ -337,42 +337,43 @@ comparable term-for-term with the superseded table.
 
 ### Evidence
 
-Coverage 8,162/8,162 claim-like supported sentences. n = 300 per row.
+**Test split only** (80 entities x 3 seeds = 240 per row), per DECISIONS
+2026-09-07. Coverage 6,717/6,717 claim-like supported sentences.
 
 | model | arm | raw | adjusted | generic % |
 |---|---|---|---|---|
-| gpt2 | beam4 | 0.174 | **0.043** | **58.4** |
-| gpt2 | greedy | 0.120 | **0.085** | 33.3 |
-| gpt2 | dola_nucleus | 0.031 | 0.012 | 54.8 |
-| gpt2 | nucleus0.9 | 0.010 | 0.007 | 20.7 |
-| llama-1b | beam4 | 0.272 | 0.222 | 16.8 |
-| llama-1b | greedy | 0.094 | 0.092 | 0.9 |
-| llama-1b | nucleus0.9 | 0.073 | 0.066 | 10.2 |
-| llama-3b | beam4 | 0.263 | 0.241 | **6.3** |
-| llama-3b | greedy | 0.095 | 0.091 | 1.8 |
-| llama-3b | nucleus0.9 | 0.069 | 0.061 | 16.5 |
+| gpt2 | beam4 | 0.201 | **0.052** | **56.0** |
+| gpt2 | greedy | 0.136 | **0.092** | 33.7 |
+| gpt2 | dola_nucleus | 0.033 | 0.014 | 48.8 |
+| gpt2 | nucleus0.9 | 0.010 | 0.008 | 16.7 |
+| llama-1b | beam4 | 0.271 | 0.239 | 9.9 |
+| llama-1b | greedy | 0.084 | 0.083 | 0.7 |
+| llama-1b | nucleus0.9 | 0.075 | 0.068 | 10.7 |
+| llama-3b | beam4 | 0.256 | 0.248 | **3.6** |
+| llama-3b | greedy | 0.090 | 0.084 | 2.6 |
+| llama-3b | nucleus0.9 | 0.074 | 0.064 | 18.5 |
 
 ### Findings
 
-1. **GPT-2's beam-4 lead does not merely shrink — it inverts.** 58.4% of its
-   supported claims fit a different person. Adjusted, beam4 falls to 0.043
-   while greedy holds 0.085: greedy becomes the more factual arm by 2x, and
+1. **GPT-2's beam-4 lead does not merely shrink — it inverts.** 56.0% of its
+   supported claims fit a different person. Adjusted, beam4 falls to 0.052
+   while greedy holds 0.092: greedy becomes the more factual arm by ~1.8x, and
    beam4 drops from first to second within GPT-2. The superseded table
    reported this as "level with greedy", which understated it.
-2. **The Llama beam-4 advantage is real**, losing 16.8% and 6.3%, and beam4
-   stays first in both models under either convention.
-3. **Genericity falls monotonically with scale: 58.4 -> 16.8 -> 6.3.** Larger
+2. **The Llama beam-4 advantage is real**, losing only 9.9% and 3.6%, and
+   beam4 stays first in both models under either convention (0.239, 0.248).
+3. **Genericity falls monotonically with scale: 56.0 -> 9.9 -> 3.6.** Larger
    models make more specific, more falsifiable claims. This explains GPT-2
    scoring above 0.9 on obscure entities without invoking copying, which
    `scripts/copy_check.py` had already excluded (max 8-gram overlap 0.061).
-4. **Sampling is consistently more generic than greedy, but it is not the most
-   generic mode.** nucleus0.9 loses 10.2% / 16.5% against greedy's 0.9% / 1.8%
-   on the Llamas — but beam4 is more generic than nucleus for gpt2 (58.4 vs
-   20.7) and llama-1b (16.8 vs 10.2), and less so only for llama-3b (6.3 vs
-   16.5). The superseded claim that sampling, not beam search, is the generic
-   mode does not survive the correction.
-5. **`dola_nucleus` is the second-most generic GPT-2 arm** at 54.8%, dropping
-   from 3rd to 6th place once adjusted.
+4. **Sampling is far more generic than greedy, and for the Llamas it is the
+   most generic mode; for GPT-2 beam search is.** nucleus0.9 loses 10.7% and
+   18.5% against greedy's 0.7% and 2.6%, and exceeds even beam4 on both Llamas
+   (10.7 vs 9.9; 18.5 vs 3.6). GPT-2 is the exception, and by a wide margin:
+   beam4 56.0 against nucleus 16.7. So "sampling is the generic mode" holds at
+   1B and 3B but not at 124M, where beam search dominates it.
+5. **`dola_nucleus` is the second-most generic GPT-2 arm** at 48.8%, dropping
+   from 3rd to 5th place once adjusted.
 
 ### Consequence
 

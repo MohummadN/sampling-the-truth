@@ -409,14 +409,14 @@ entity prefix and are entailed by any page at all. Both are fixed: the
 hypothesis now matches, and src.text.is_claim excludes non-claims from
 numerator and denominator alike.
 
-Corrected result, 8,162/8,162 claim-like supported sentences re-scored against
-a same-stratum wrong page. Generic share under beam4: gpt2 58.4%, llama-1b
-16.8%, llama-3b 6.3% — still monotonic in scale. **GPT-2's beam4 lead does not
-collapse to greedy's level, it inverts**: adjusted beam4 0.043 against greedy
-0.085, so greedy is the more factual GPT-2 arm by 2x and beam4 falls from first
-to second. Both Llamas keep beam4 first (0.222, 0.241). Raw rate is the
-headline; **adjusted is primary for cross-model comparisons**, because
-genericity varies systematically with scale.
+Corrected result, reported on the test split only (80 entities x 3 seeds,
+coverage 6,717/6,717 claim-like supported sentences). Generic share under
+beam4: gpt2 56.0%, llama-1b 9.9%, llama-3b 3.6% — monotonic in scale.
+**GPT-2's beam4 lead does not collapse to greedy's level, it inverts**:
+adjusted beam4 0.052 against greedy 0.092, so greedy is the more factual GPT-2
+arm by ~1.8x and beam4 falls from first to second. Both Llamas keep beam4 first
+(0.239, 0.248). Raw rate is the headline; **adjusted is primary for cross-model
+comparisons**, because genericity varies systematically with scale.
 
 2026-09-17  Analysis scripts report the 80 test entities by default.
             DECISIONS 2026-09-07 says only the 80 are reported, but
