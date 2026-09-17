@@ -112,7 +112,6 @@ This file becomes the paper's Experimental Setup section.
 
 ## Still open
 - Entailment threshold theta          (tune on dev only)
-- SC selection embedder
 
 2026-09-07  dtype = torch.float16 for all three generator models.
             Measured on TITAN Xp (sm_61, gpt2, 256 greedy tokens): fp32 114.6
@@ -427,4 +426,24 @@ comparisons**, because genericity varies systematically with scale.
             for diagnostics, and every script prints which split it reported.
             Numbers produced before this change were over all 100 and must be
             regenerated before they go in the paper.
+
+2026-09-17  Self-consistency aggregation = embedding medoid, encoder
+            sentence-transformers/all-mpnet-base-v2. Closes the "SC selection
+            embedder" question above.
+            Wang et al. (2023) aggregate by MAJORITY VOTE over answers, which
+            is undefined for open-ended text: five biographies are never
+            string-identical, so the indicator is 0 for every pair and the
+            argmax is meaningless. We replace equality with similarity and keep
+            the sample with the highest mean cosine similarity to the other
+            four. This is a real redefinition of the method and is declared as
+            such in the paper - what we evaluate is "sample five, keep the
+            medoid", not self-consistency as Wang et al. defined it.
+            Encoder: the same all-mpnet-base-v2 already used for evidence
+            retrieval - one embedding model in the project, already cached, and
+            its checkpoint is already named in Experimental Setup. With L2
+            normalisation the medoid and the geometric-centroid nearest
+            neighbour rank identically, differing only by the constant 1/k
+            self-similarity term.
+            The medoid cannot beat the pool it is given, so the analysis
+            reports the oracle best-of-five bound beside it.
 
