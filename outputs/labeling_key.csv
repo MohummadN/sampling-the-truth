@@ -1,0 +1,101 @@
+id,model,arm,seed,entity,stratum,band,p_entail,verifier,weight
+L001,llama-1b,beam4,5678,André Le Nôtre,1,mid_hi,0.7804,supported,6.1
+L002,llama-3b,dola_nucleus,9012,"Felipe (footballer, born 1977)",0,mid_lo,0.2102,unsupported,50.1
+L003,llama-1b,dola_nucleus,5678,Nobuhiro Shimatani,0,hi,0.9353,supported,3.2
+L004,gpt2,temp0.7,1234,Alexander Vovin,0,hi,0.9929,supported,3.2
+L005,llama-1b,temp0.7,1234,Dana Awartani,0,mid_hi,0.8448,supported,2.9
+L006,llama-3b,beam4,9012,Joseph Kony,2,mid_hi,0.6914,supported,9.7
+L007,llama-1b,dola,5678,Thierry Henry,2,mid_lo,0.1603,unsupported,25.3
+L008,gpt2,beam4,9012,Lunay (singer),0,mid_hi,0.5425,supported,2.9
+L009,gpt2,nucleus0.9,1234,Nuh Omar,1,mid_lo,0.2085,unsupported,26.4
+L010,llama-3b,nucleus0.9,9012,Dana Awartani,0,lo,0.0448,unsupported,577.2
+L011,llama-3b,beam4,1234,Alexander Vovin,0,hi,0.9419,supported,3.2
+L012,llama-1b,nucleus0.9,5678,"Felipe (footballer, born 1977)",0,mid_lo,0.1497,unsupported,50.1
+L013,llama-1b,temp0.7,5678,Walter Model,2,mid_hi,0.7759,supported,9.7
+L014,llama-3b,greedy_reppen,1234,Xi Jinping,2,mid_hi,0.8499,supported,9.7
+L015,gpt2,temp0.7,9012,Andriy Yarmolenko,1,lo,0.0007,unsupported,476.4
+L016,gpt2,dola,5678,Andriy Yarmolenko,1,mid_lo,0.1742,unsupported,26.4
+L017,llama-1b,greedy_reppen,9012,"Felipe (footballer, born 1977)",0,mid_lo,0.2231,unsupported,50.1
+L018,gpt2,dola_nucleus,1234,Marty Mayberry,1,lo,0.0043,unsupported,476.4
+L019,llama-3b,temp0.7,9012,Fahadh Faasil,2,mid_hi,0.7080,supported,9.7
+L020,llama-1b,dola,1234,Alexander Vovin,0,mid_lo,0.1484,unsupported,50.1
+L021,llama-3b,temp0.7,9012,Karl Urban,1,mid_hi,0.5754,supported,6.1
+L022,gpt2,temp0.7,1234,Xi Jinping,2,hi,0.9787,supported,40.1
+L023,llama-1b,temp1.3,9012,Lunay (singer),0,mid_lo,0.2023,unsupported,50.1
+L024,llama-3b,beam4,9012,Karl Urban,1,mid_lo,0.1184,unsupported,26.4
+L025,llama-3b,dola,5678,Joseph Kony,2,hi,0.9986,supported,40.1
+L026,llama-3b,beam4,5678,Thierry Henry,2,mid_lo,0.1213,unsupported,25.3
+L027,llama-3b,greedy_reppen,9012,Xi Jinping,2,mid_hi,0.8429,supported,9.7
+L028,llama-3b,temp0.7,5678,Lou Briel,1,mid_lo,0.1801,unsupported,26.4
+L029,llama-3b,temp1.3,9012,Thierry Henry,2,mid_lo,0.2561,unsupported,25.3
+L030,llama-3b,temp0.7,5678,Andriy Yarmolenko,1,hi,0.9184,supported,20.7
+L031,llama-1b,dola_nucleus,1234,Joseph Kony,2,mid_lo,0.3254,unsupported,25.3
+L032,llama-3b,temp1.3,5678,Walter Model,2,lo,0.0227,unsupported,498.0
+L033,gpt2,temp0.7,9012,Andriy Yarmolenko,1,lo,0.0043,unsupported,476.4
+L034,llama-1b,nucleus0.9,9012,Fahadh Faasil,2,hi,0.9915,supported,40.1
+L035,gpt2,temp0.7,1234,Xi Jinping,2,hi,0.9620,supported,40.1
+L036,gpt2,nucleus0.9,1234,Alexander Vovin,0,mid_lo,0.3120,unsupported,50.1
+L037,llama-1b,dola,1234,Nobuhiro Shimatani,0,mid_hi,0.5483,supported,2.9
+L038,llama-1b,greedy_reppen,9012,Alexander Vovin,0,mid_lo,0.1484,unsupported,50.1
+L039,llama-3b,dola,9012,Andriy Yarmolenko,1,mid_hi,0.8561,supported,6.1
+L040,llama-1b,nucleus0.9,5678,André Le Nôtre,1,mid_hi,0.6867,supported,6.1
+L041,llama-3b,nucleus0.9,9012,"Felipe (footballer, born 1977)",0,hi,0.9949,supported,3.2
+L042,llama-1b,dola_nucleus,5678,André Le Nôtre,1,hi,0.9888,supported,20.7
+L043,llama-3b,dola,9012,Nobuhiro Shimatani,0,mid_lo,0.1243,unsupported,50.1
+L044,llama-1b,dola,9012,Nobuhiro Shimatani,0,mid_hi,0.5483,supported,2.9
+L045,llama-1b,beam4,9012,Joseph Kony,2,mid_lo,0.3587,unsupported,25.3
+L046,llama-1b,dola,9012,Fahadh Faasil,2,mid_hi,0.8242,supported,9.7
+L047,llama-3b,greedy,1234,Andriy Yarmolenko,1,mid_hi,0.8270,supported,6.1
+L048,llama-3b,dola_nucleus,9012,Xi Jinping,2,hi,0.9965,supported,40.1
+L049,llama-1b,nucleus0.9,9012,Andriy Yarmolenko,1,mid_hi,0.5136,supported,6.1
+L050,llama-3b,beam4,9012,Alexander Vovin,0,mid_hi,0.6732,supported,2.9
+L051,llama-1b,greedy_reppen,9012,André Le Nôtre,1,mid_lo,0.2763,unsupported,26.4
+L052,llama-1b,dola_nucleus,1234,Fahadh Faasil,2,mid_lo,0.1081,unsupported,25.3
+L053,llama-1b,beam4,1234,André Le Nôtre,1,hi,0.9988,supported,20.7
+L054,llama-1b,temp0.7,9012,Andriy Yarmolenko,1,hi,0.9927,supported,20.7
+L055,llama-1b,temp0.7,1234,Zewde Gebre-Sellassie,0,lo,0.0045,unsupported,577.2
+L056,llama-3b,temp0.7,9012,André Le Nôtre,1,mid_hi,0.5120,supported,6.1
+L057,llama-3b,nucleus0.9,1234,"Felipe (footballer, born 1977)",0,hi,0.9832,supported,3.2
+L058,llama-1b,temp0.7,5678,Andriy Yarmolenko,1,hi,0.9760,supported,20.7
+L059,llama-1b,nucleus0.9,5678,"Felipe (footballer, born 1977)",0,hi,0.9949,supported,3.2
+L060,gpt2,greedy_reppen,9012,Walter Model,2,lo,0.0087,unsupported,498.0
+L061,llama-1b,temp1.3,9012,Andriy Yarmolenko,1,mid_hi,0.7584,supported,6.1
+L062,llama-3b,greedy_reppen,1234,Nobuhiro Shimatani,0,mid_hi,0.6687,supported,2.9
+L063,llama-3b,temp0.7,5678,Zewde Gebre-Sellassie,0,hi,0.9514,supported,3.2
+L064,llama-3b,nucleus0.9,1234,André Le Nôtre,1,mid_hi,0.8597,supported,6.1
+L065,llama-3b,dola_nucleus,1234,Karl Urban,1,hi,0.9988,supported,20.7
+L066,llama-1b,greedy_reppen,5678,Lunay (singer),0,lo,0.0637,unsupported,577.2
+L067,llama-1b,nucleus0.9,1234,Thierry Henry,2,mid_hi,0.7810,supported,9.7
+L068,llama-1b,greedy_reppen,1234,Fahadh Faasil,2,lo,0.0045,unsupported,498.0
+L069,llama-3b,beam4,9012,Fahadh Faasil,2,mid_lo,0.1594,unsupported,25.3
+L070,llama-1b,nucleus0.9,1234,Thierry Henry,2,mid_hi,0.5837,supported,9.7
+L071,llama-3b,greedy_reppen,9012,"Felipe (footballer, born 1977)",0,mid_lo,0.2556,unsupported,50.1
+L072,gpt2,temp0.7,9012,Joseph Kony,2,mid_hi,0.5295,supported,9.7
+L073,llama-3b,beam4,1234,Valerie Harper,2,hi,0.9941,supported,40.1
+L074,gpt2,dola_nucleus,1234,Andriy Yarmolenko,1,mid_lo,0.1534,unsupported,26.4
+L075,llama-3b,dola_nucleus,9012,Marty Mayberry,1,mid_lo,0.1596,unsupported,26.4
+L076,llama-3b,dola_nucleus,1234,Nobuhiro Shimatani,0,mid_hi,0.5650,supported,2.9
+L077,llama-1b,dola,5678,Thierry Henry,2,lo,0.0747,unsupported,498.0
+L078,llama-3b,dola_nucleus,5678,André Le Nôtre,1,mid_hi,0.7668,supported,6.1
+L079,llama-3b,dola,9012,William G. Angel,0,lo,0.0074,unsupported,577.2
+L080,llama-3b,dola_nucleus,9012,Alexander Vovin,0,hi,0.9965,supported,3.2
+L081,llama-1b,beam4,9012,Lunay (singer),0,hi,0.9910,supported,3.2
+L082,llama-3b,beam4,1234,Karl Urban,1,lo,0.0010,unsupported,476.4
+L083,llama-3b,dola_nucleus,9012,Thierry Henry,2,hi,0.9076,supported,40.1
+L084,llama-1b,temp0.7,1234,Fahadh Faasil,2,hi,0.9782,supported,40.1
+L085,gpt2,beam4,5678,Lunay (singer),0,mid_hi,0.5425,supported,2.9
+L086,llama-1b,dola,5678,Nuh Omar,1,lo,0.0030,unsupported,476.4
+L087,llama-3b,dola_nucleus,9012,Thierry Henry,2,mid_lo,0.4046,unsupported,25.3
+L088,llama-1b,temp1.3,1234,Nuh Omar,1,mid_lo,0.1730,unsupported,26.4
+L089,llama-1b,dola_nucleus,9012,Dana Awartani,0,mid_hi,0.5767,supported,2.9
+L090,llama-3b,greedy_reppen,5678,Nobuhiro Shimatani,0,mid_hi,0.6687,supported,2.9
+L091,llama-3b,temp1.3,5678,"Felipe (footballer, born 1977)",0,mid_hi,0.7185,supported,2.9
+L092,llama-3b,greedy_reppen,9012,Andriy Yarmolenko,1,mid_hi,0.6478,supported,6.1
+L093,llama-3b,beam4,9012,Valerie Harper,2,hi,0.9809,supported,40.1
+L094,llama-3b,dola_nucleus,9012,Karl Urban,1,hi,0.9993,supported,20.7
+L095,llama-1b,temp0.7,9012,Valerie Harper,2,mid_lo,0.3096,unsupported,25.3
+L096,llama-1b,temp1.3,9012,Andriy Yarmolenko,1,mid_lo,0.1840,unsupported,26.4
+L097,llama-3b,beam4,5678,Xi Jinping,2,mid_hi,0.5485,supported,9.7
+L098,llama-1b,beam4,5678,André Le Nôtre,1,hi,0.9988,supported,20.7
+L099,llama-1b,dola_nucleus,9012,André Le Nôtre,1,hi,0.9964,supported,20.7
+L100,llama-3b,nucleus0.9,5678,Joseph Kony,2,mid_hi,0.8066,supported,9.7

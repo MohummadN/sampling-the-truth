@@ -1,0 +1,55 @@
+{
+  "seed": 20260914,
+  "cells": {
+    "stratum0_hi": {
+      "population": 29,
+      "sampled": 9
+    },
+    "stratum0_lo": {
+      "population": 2309,
+      "sampled": 4
+    },
+    "stratum0_mid_hi": {
+      "population": 32,
+      "sampled": 11
+    },
+    "stratum0_mid_lo": {
+      "population": 451,
+      "sampled": 9
+    },
+    "stratum1_hi": {
+      "population": 186,
+      "sampled": 9
+    },
+    "stratum1_lo": {
+      "population": 2382,
+      "sampled": 5
+    },
+    "stratum1_mid_hi": {
+      "population": 67,
+      "sampled": 11
+    },
+    "stratum1_mid_lo": {
+      "population": 238,
+      "sampled": 9
+    },
+    "stratum2_hi": {
+      "population": 361,
+      "sampled": 9
+    },
+    "stratum2_lo": {
+      "population": 1992,
+      "sampled": 4
+    },
+    "stratum2_mid_hi": {
+      "population": 107,
+      "sampled": 11
+    },
+    "stratum2_mid_lo": {
+      "population": 228,
+      "sampled": 9
+    }
+  },
+  "total_frame": 8382,
+  "sampled": 100
+}
