@@ -29,12 +29,16 @@ import transformers
 from transformers import set_seed
 
 from src.data import load_entities
-from src.decoding import ARMS, COMMON, kwargs_for
+from src.decoding import COMMON, GRID_ARMS, kwargs_for
 from src.device import pick_device
 from src.models import DTYPE, MODELS, load, revision
 from src.text import split_sentences
 
 TASK = "factscore_bio"          # matches the schema in 04 §6.4
+# The nine frozen arms, never ARMS: appending a dev-only sensitivity arm to
+# ARMS would otherwise silently widen this default and a re-run of any shard
+# would write extra arms into the frozen grid.
+DEFAULT_ARMS = ",".join(GRID_ARMS)
 OUT_DIR = "outputs"
 MAX_NEW_TOKENS = int(COMMON["max_new_tokens"])
 
@@ -293,7 +297,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True, choices=sorted(MODELS))
     ap.add_argument("--seed", required=True, type=int)
-    ap.add_argument("--arms", default=",".join(ARMS),
+    ap.add_argument("--arms", default=DEFAULT_ARMS,
                     help="comma-separated; default all")
     ap.add_argument("--split", default=None, choices=["dev", "test"])
     ap.add_argument("--limit", type=int, default=None,

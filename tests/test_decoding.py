@@ -56,3 +56,19 @@ def test_sampling_arms_disable_top_k() -> None:
         kwargs = kwargs_for(arm)
         if kwargs["do_sample"]:
             assert kwargs["top_k"] == 0, f"{arm}: top_k must be 0, got {kwargs['top_k']}"
+
+def test_grid_default_excludes_dev_only_arms():
+    """dola_high and dola_nucleus_high are dev-only sensitivity arms. If they
+    reach generate.py's --arms default, a re-run of any shard silently writes
+    11 arms into the frozen 8,100-record grid."""
+    from src.decoding import GRID_ARMS
+    from src.generate import DEFAULT_ARMS
+    assert len(GRID_ARMS) == 9
+    assert not ({"dola_high", "dola_nucleus_high"} & set(GRID_ARMS))
+    assert DEFAULT_ARMS.split(",") == list(GRID_ARMS)
+
+
+def test_dev_only_arms_still_resolve():
+    """Keeping them out of the default must not make them unrunnable."""
+    for arm in ("dola_high", "dola_nucleus_high"):
+        assert kwargs_for(arm)["dola_layers"] == "high"

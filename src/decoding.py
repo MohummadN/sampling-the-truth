@@ -121,6 +121,12 @@ ARMS: dict[str, dict[str, object]] = {
     },
 }
 
+# The frozen grid: the nine arms that produced the 8,100 records. Captured
+# BEFORE the dev-only arms below, so generate.py's default can never widen just
+# because a sensitivity arm was appended to ARMS.
+GRID_ARMS: tuple[str, ...] = tuple(ARMS)
+
+
 # Dev-only sensitivity arms (Stage 6). Identical to their parents except for
 # dola_layers, so any difference isolates the layer-selection choice alone.
 # Not part of the frozen 8,100-record grid: run on the 20 dev entities with
