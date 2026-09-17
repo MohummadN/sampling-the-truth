@@ -381,3 +381,14 @@ beside it and is **primary for cross-model claims**, because genericity varies
 systematically with scale and raw rates are not comparable across models
 without it. Noise caveat: generic % for GPT-2's weakest arms rests on few
 supported sentences.
+
+## Labelling the 'absent' category (17 September)
+
+`absent` means the claim is TRUE of this person but does not appear in the
+page. A single retrieved evidence window cannot establish that, so
+`scripts/sample_for_labeling.py` writes the full pinned page for every sampled
+entity to `outputs/labeling_pages/` and the sheet carries a `page_file` column.
+
+The pinned snapshot matters: the pages are `20231101.en`, and live Wikipedia
+has moved on. Judging absence against the live site would measure a different
+corpus than the metric used.

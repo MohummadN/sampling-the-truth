@@ -23,10 +23,11 @@ import collections
 import csv
 import glob
 import json
+import os
 import random
 import re
 
-from src.data import load_entities
+from src.data import load_entities, load_pages
 from src.text import is_claim
 
 SEED = 20260914
@@ -102,11 +103,26 @@ def main():
     for i, row in enumerate(picked, 1):
         row["id"] = f"L{i:03d}"
 
+    # "absent" means TRUE of this person but not in the page, which no single
+    # retrieved window can establish. Dump the pinned page for every sampled
+    # entity so the labeller reads the same snapshot the metric used: live
+    # Wikipedia has moved on from 20231101.en and would disagree.
+    pages = load_pages()
+    os.makedirs("outputs/labeling_pages", exist_ok=True)
+    page_file = {}
+    for ent in sorted({r["entity"] for r in picked}):
+        name = re.sub(r"[^\w\- ]", "_", ent).strip() + ".txt"
+        with open(f"outputs/labeling_pages/{name}", "w", encoding="utf-8") as fh:
+            fh.write(pages[ent])
+        page_file[ent] = name
+
     with open("outputs/labeling_sheet.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["id", "entity", "sentence", "evidence", "label", "note"])
+        w.writerow(["id", "entity", "page_file", "sentence", "evidence",
+                    "label", "note"])
         for r in picked:
-            w.writerow([r["id"], r["entity"], r["sentence"], r["evidence"], "", ""])
+            w.writerow([r["id"], r["entity"], page_file[r["entity"]],
+                        r["sentence"], r["evidence"], "", ""])
 
     with open("outputs/labeling_key.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
@@ -122,6 +138,7 @@ def main():
                "sampled": len(picked)},
               open("outputs/labeling_frame.json", "w"), indent=2)
 
+    print(f"pages: {len(page_file)} written to outputs/labeling_pages/")
     print(f"frame: {sum(len(v) for v in frame.values())} unique sentences")
     print(f"sampled: {len(picked)}")
     by_band = collections.Counter(r["band"] for r in picked)
