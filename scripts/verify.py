@@ -43,6 +43,8 @@ def main() -> None:
     ap.add_argument("--arms", default=None, help="comma-separated; default all")
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--theta", type=float, default=THETA)
+    ap.add_argument("--top-m", type=int, default=TOP_M,
+                    help="windows retrieved per sentence")
     ap.add_argument("--allow-cpu", action="store_true",
                     help="debugging only; never for grid shards")
     ap.add_argument("--src", default=None,
@@ -109,7 +111,8 @@ def main() -> None:
                 index_cache[ent] = build_index(pages[ent], retriever)
             res = score_generation(r["text"], ent, index_cache[ent], retriever,
                                    tok, model, entail_id,
-                                   theta=args.theta, cache=nli_cache)
+                                   theta=args.theta, m=args.top_m,
+                                   cache=nli_cache)
 
             rec = {
                 "model": r["model"], "decoding": r["decoding"],
@@ -122,7 +125,7 @@ def main() -> None:
                 "sentences": res["sentences"] if args.details else None,
                 "nli_model": NLI_NAME, "retriever": RETRIEVER_NAME,
                 "device": str(model.device),
-                "theta": args.theta, "top_m": TOP_M, "window": WINDOW,
+                "theta": args.theta, "top_m": args.top_m, "window": WINDOW,
                 "git_commit": GIT_COMMIT,
             }
             append(out, rec)

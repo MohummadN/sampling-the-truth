@@ -439,3 +439,41 @@ Caveat to report: TPR and FPR are estimated per stratum from 33-34 labels each
 and are pooled across arms, so the per-stratum correction assumes the verifier
 errs at the same rate for every decoding strategy. `scripts/calibrate.py`
 carries the interval.
+
+---
+
+## Problem 4 — how much does top-5 retrieval miss? (18 September)
+
+The 68 human-labelled `not_addressed` sentences were re-scored against **every**
+3-sentence window of the page, not just the top-5 the retriever returned. If the
+page entails the claim somewhere, the retrieval stage lost it.
+
+Scanning all windows gives the NLI far more chances to fire, so the identical
+scan was run against a same-stratum **wrong page** as a noise floor. Both use
+the hypothesis form the pipeline uses, `"<entity>: <sentence>"`.
+
+| threshold | true page | wrong page | excess |
+|---|---|---|---|
+| 0.50 (unweighted) | 45.6% | 11.8% | +33.8% |
+| 0.90 (unweighted) | 30.9% | 1.5% | +29.4% |
+| 0.50 (weighted to frame) | 6.2% | 1.5% | +4.7% |
+| **0.90 (weighted to frame)** | **4.5%** | **0.1%** | **+4.4%** |
+
+**Read the weighted row.** The unweighted figures reflect the sampling design,
+which deliberately oversamples the middle and high p_entail bands — exactly the
+sentences a page plausibly discusses. Reweighted to the frame, which is
+dominated by the low band (fabricated and degenerate text), retrieval failure is
+**about 4% of `not_addressed` sentences, roughly 3% of all sentences**.
+
+At theta = 0.5 the wrong page fires almost as often as the true page in the
+unweighted view: an all-window maximum at 0.5 is multiple-comparison noise. Only
+the 0.9 reading is interpretable for this scan.
+
+Caveat: the weighted estimate is carried by few high-weight rows (4 sampled per
+stratum in the low band), so it is noisy. `slurm/topm20.sbatch` re-verifies the
+20 dev entities at top-m = 20 as an independent check that needs no weighting.
+
+**Consequence.** The metric errs in both directions: the NLI over-calls support
+on the evidence it sees (FPR 0.041), and the retriever under-supplies evidence
+(~3% of sentences). They partly cancel. Both are now measured rather than
+asserted, and both are reported.

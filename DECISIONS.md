@@ -478,3 +478,16 @@ Raw distribution 25 / 7 / 68. Labels drawn by `scripts/sample_for_labeling.py`
 - Remaining: `not_addressed` is not yet split into retrieval failure versus
   reference-coverage limit. One short GPU pass over all page windows for those
   rows would measure the retrieval share exactly.
+
+## Retrieval depth (18 September) — see docs/metric_validity.md Problem 4
+
+`TOP_M` stays at 5. All-window re-scoring of the 68 human-labelled
+`not_addressed` sentences, with a same-stratum wrong page as noise floor, puts
+retrieval failure at **4.4% of that population weighted to the frame** (theta =
+0.9; the wrong page fires on 0.1%), i.e. roughly 3% of all sentences. Reported
+as a measured limitation rather than re-running the grid. `slurm/topm20.sbatch`
+re-verifies the dev entities at top-m = 20 as an independent check.
+
+Also recorded: the two controls (`mismatch_control.py`, `split_not_addressed.py`)
+score the same hypothesis form as the pipeline, `"<entity>: <sentence>"`, so
+their numbers are comparable to the verifier's own.
