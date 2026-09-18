@@ -447,3 +447,34 @@ comparisons**, because genericity varies systematically with scale.
             The medoid cannot beat the pool it is given, so the analysis
             reports the oracle best-of-five bound beside it.
 
+
+## Stage 7 — verifier validation and calibration (18 September)
+
+100 blind manual labels, entailment-style three-way (supported / contradicted /
+not_addressed), stratified by entity stratum x p_entail band, zero `unsure`.
+Raw distribution 25 / 7 / 68. Labels drawn by `scripts/sample_for_labeling.py`
+(seed 20260914), collected with `scripts/label.py`, analysed by
+`scripts/analyze_labels.py` and `scripts/calibrate.py`.
+
+- **theta stays at 0.5.** Balanced accuracy peaks at 0.55 (0.956) versus 0.953
+  at 0.50 — inside noise at n=100. The pre-registered value is kept; no
+  re-verification.
+- **Verifier characterisation: high recall, low precision.** Weighted TPR
+  0.947, FPR 0.041, precision 0.582, balanced accuracy 0.953. One false
+  negative in 100; 36 false positives, 34 of them `not_addressed`. This is the
+  neutral trap, predicted in the study material and now measured.
+- **False positives are confident (mean p_entail 0.754), not borderline.**
+  This withdraws the [0.4, 0.5) band bound in docs/metric_validity.md.
+- **All support rates are reported both raw and calibrated** by Rogan-Gladen,
+  `T = (R - FPR)/(TPR - FPR)` ~ `1.10 R - 0.045`. Ranking is unchanged; levels
+  fall. Arms at or below the false-positive floor of R = 0.041 are reported as
+  **indistinguishable from zero true support**, not as small positive numbers.
+- **The stratum effect survives calibration**: llama-1b beam4 goes
+  0.185 / 0.239 / 0.414 calibrated against 0.199 / 0.264 / 0.426 raw, +0.229
+  versus +0.227.
+- **23 of 100 sentences are `partial`** — mixing established and unestablished
+  facts. Sentence-level verification forces an all-or-nothing call on them;
+  reported as a limitation.
+- Remaining: `not_addressed` is not yet split into retrieval failure versus
+  reference-coverage limit. One short GPU pass over all page windows for those
+  rows would measure the retrieval share exactly.

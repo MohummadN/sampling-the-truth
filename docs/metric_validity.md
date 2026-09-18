@@ -393,3 +393,49 @@ entity to `outputs/labeling_pages/` and the sheet carries a `page_file` column.
 The pinned snapshot matters: the pages are `20231101.en`, and live Wikipedia
 has moved on. Judging absence against the live site would measure a different
 corpus than the metric used.
+
+---
+
+## Amendment — the manual labels supersede the band bound (18 September)
+
+Problem 1 bounded the pool-size artifact at ~0.01 by counting sentences with
+p_entail in [0.4, 0.5), on the reasoning that a pool-size shift could only
+matter by pushing borderline scores across theta. **That reasoning was wrong
+about the mechanism.**
+
+The 100 manual labels show the verifier's false positives are not borderline:
+their **mean p_entail is 0.754**. The verifier is not nudging marginal claims
+over the line; it is confidently entailing claims the evidence does not
+address — 34 of its 36 false positives are human-labelled `not_addressed`.
+A bound built on the near-threshold band cannot see that channel at all.
+
+The labels measure the quantity directly. Weighted false-positive rate by
+stratum, at theta = 0.5:
+
+| stratum | FPR | TPR | n labels |
+|---|---|---|---|
+| 0 | 0.017 | 1.000 | 33 |
+| 1 | 0.033 | 1.000 | 34 |
+| 2 | 0.079 | 0.917 | 33 |
+
+The false-positive rate rises ~4.6x from stratum 0 to stratum 2, far above the
+0.01 the band analysis suggested. **The [0.4, 0.5) band bound is withdrawn.**
+
+**The stratum effect nevertheless survives.** Applying the Rogan-Gladen
+correction per stratum — `T = (R - FPR) / (TPR - FPR)`, prevalence-independent
+— to llama-1b beam4:
+
+| stratum | raw | calibrated |
+|---|---|---|
+| 0 | 0.199 | 0.185 |
+| 1 | 0.264 | 0.239 |
+| 2 | 0.426 | 0.414 |
+
++0.227 raw becomes +0.229 calibrated: the higher false-positive rate at
+stratum 2 is offset by the lower recall there. The finding stands, and now
+stands on measurement rather than on a proxy argument.
+
+Caveat to report: TPR and FPR are estimated per stratum from 33-34 labels each
+and are pooled across arms, so the per-stratum correction assumes the verifier
+errs at the same rate for every decoding strategy. `scripts/calibrate.py`
+carries the interval.
