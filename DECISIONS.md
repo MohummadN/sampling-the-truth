@@ -491,3 +491,22 @@ re-verifies the dev entities at top-m = 20 as an independent check.
 Also recorded: the two controls (`mismatch_control.py`, `split_not_addressed.py`)
 score the same hypothesis form as the pipeline, `"<entity>: <sentence>"`, so
 their numbers are comparable to the verifier's own.
+
+## Retrieval depth sensitivity (18 September)
+
+The dev entities were re-verified at `top_m = 20` (`slurm/topm20.sbatch`,
+`scripts/compare_topm.py`), paired over the 20 dev entities with a 10,000-sample
+bootstrap.
+
+- **Mean shift +0.022 across the 24 model x arm cells, sd 0.014, every cell
+  positive.** This agrees with the independent all-window estimate of ~3% of all
+  sentences lost to top-5 retrieval (docs/metric_validity.md Problem 4), which
+  was derived from human labels and sampling weights rather than a re-run.
+- **Robust under both depths:** beam4 first and dola_nucleus second in all three
+  models; temp1.3 last in all three.
+- **Not robust:** the middle ranks reorder (llama-1b temp0.7 over greedy, dola
+  over nucleus0.9; llama-3b greedy falls from 5th to 7th). Those arms differ by
+  0.01-0.03, inside their own intervals, so they are reported as a band rather
+  than an ordering.
+- `TOP_M` stays at 5 for all headline numbers; this sweep is reported as the
+  sensitivity check.
