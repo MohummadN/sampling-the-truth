@@ -21,10 +21,19 @@ import collections
 import csv
 import glob
 import json
+import os
 import random
+
+from src.data import reported_entities
 
 LAB, KEY = "outputs/labels.csv", "outputs/labeling_key.csv"
 THETA, B = 0.5, 2000
+# Reported numbers are the 80 test entities (DECISIONS 2026-09-07). The
+# labels themselves come from dev, so TPR/FPR are estimated on one split and
+# applied to the other - which is the point of a prevalence-independent
+# correction, and keeps the reported rates held out.
+SPLIT = os.environ.get("SPLIT", "test")
+KEEP = reported_entities()
 MODELS = ("gpt2", "llama-1b", "llama-3b")
 
 
@@ -66,6 +75,8 @@ def load_observed():
     for p in glob.glob("outputs/verdicts_*.jsonl"):
         for line in open(p):
             r = json.loads(line)
+            if r["entity"] not in KEEP:
+                continue
             v = r["support_rate"]
             acc[(r["model"], r["decoding"])][r["entity"]].append(
                 0.0 if v is None else v)
@@ -84,6 +95,7 @@ def main():
     idx_of = {e: i for i, e in enumerate(ents)}
 
     tpr, fpr = rates(labels)
+    print(f"reporting split: {SPLIT} ({len(KEEP)} entities); labels are from dev")
     print(f"verifier at theta={THETA}: TPR {tpr:.3f}  FPR {fpr:.3f}  "
           f"(n={len(labels)} labels)")
     print(f"calibration: T = (R - {fpr:.3f}) / ({tpr:.3f} - {fpr:.3f})"
