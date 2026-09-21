@@ -7,8 +7,15 @@ No GPU: reads the per-sentence verdicts already on disk.
 import collections
 import glob
 import json
+import os
 import re
 import statistics as st
+
+from src.data import reported_entities
+from src.text import is_claim
+
+SPLIT = os.environ.get("SPLIT", "test")
+KEEP = reported_entities()
 
 WS = re.compile(r"\s+")
 TEXT_KEYS = ("sentence", "text", "hypothesis")
@@ -44,12 +51,26 @@ def main():
     for path in sorted(glob.glob("outputs/verdicts_*.jsonl")):
         for line in open(path):
             r = json.loads(line)
+            if r["entity"] not in KEEP:
+                continue
             sents = r.get("sentences")
             if not sents:
                 continue
             if tkey is None:
                 tkey, skey = pick_text(sents[0]), pick_sup(sents[0])
+                print(f"reporting split: {SPLIT} ({len(KEEP)} entities)")
                 print(f"sentence key {tkey!r}, supported key {skey!r}\n")
+
+            # drift check on the UNFILTERED list: the stored support_rate was
+            # computed over all sentences, so comparing a claim-filtered rate
+            # to it would differ by construction and validate nothing
+            all_rate = sum(bool(x[skey]) for x in sents) / len(sents)
+            if r.get("support_rate") is not None and abs(all_rate - r["support_rate"]) > 1e-6:
+                drift += 1
+
+            sents = [x for x in sents if is_claim(x[tkey], r["entity"])]
+            if not sents:
+                continue
 
             seen = {}
             for s in sents:
@@ -58,8 +79,6 @@ def main():
 
             raw = sum(bool(s[skey]) for s in sents) / len(sents)
             ded = sum(bool(s[skey]) for s in uniq) / len(uniq)
-            if r.get("support_rate") is not None and abs(raw - r["support_rate"]) > 1e-6:
-                drift += 1
 
             a = rows[r["decoding"]]
             a["raw"].append(raw)

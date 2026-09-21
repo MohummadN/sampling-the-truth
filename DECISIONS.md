@@ -327,9 +327,9 @@ model that emits a claim ten times has made ten claims, and deduplicating would
 remove degeneracy from the factuality axis, which is the tradeoff under study.
 The dedup table is reported as a robustness check.
 
-Duplicate-sentence fraction, mean per arm: greedy 0.597, beam4 0.505,
-dola_nucleus 0.240, dola 0.082, temp0.7 0.079, nucleus0.9 0.013, temp1.3 0.000,
-greedy_reppen 0.000. The repetition-penalty control eliminates exact sentence
+Duplicate-sentence fraction, mean per arm (test split, claims only): greedy
+0.611, beam4 0.532, dola_nucleus 0.227, temp0.7 0.081, dola 0.033, nucleus0.9
+0.013, temp1.3 0.000, greedy_reppen 0.000. The repetition-penalty control eliminates exact sentence
 repeats entirely, establishing that the repetition is a decoding artifact.
 
 ## Metric validity (14 September) — see docs/metric_validity.md
