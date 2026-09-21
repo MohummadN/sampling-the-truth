@@ -12,7 +12,10 @@ import os
 import statistics as st
 
 from src.data import reported_entities
-from src.metrics.calibration import correct, load_labels, rates
+# aliased: this script already binds a module-level `rates` for the sc_k5
+# tables, which would shadow the import
+from src.metrics.calibration import correct, load_labels
+from src.metrics.calibration import rates as label_rates
 
 SPLIT = os.environ.get("SPLIT", "test")
 KEEP = reported_entities()
@@ -61,7 +64,7 @@ for k, d in rates.items():
     sc[k[0]]["sc_k5 (one sample)"].append(st.mean(v))
     sc[k[0]]["sc_k5 (oracle best-5)"].append(max(v))
 
-TPR, FPR = rates(load_labels())
+TPR, FPR = label_rates(load_labels())
 
 print(f"reporting split: {SPLIT} ({len(KEEP)} entities)")
 print(f"calibrated with TPR {TPR:.3f}, FPR {FPR:.3f}; per-1x uses the calibrated rate")
