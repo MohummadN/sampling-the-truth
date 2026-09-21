@@ -125,6 +125,14 @@ def selfbleu_by_prompt():
     for r in read("outputs/gen_*.jsonl"):
         if isinstance(r.get("text"), str) and r["text"].strip():
             texts[(r["model"], r["decoding"], r["entity"])].append(r["text"])
+    # The sc_k5 parent holds samples rather than text, so the selected output
+    # lives in scsel_. Without this the headline sc arm has no self-BLEU.
+    # "one sample" gets none by design: each seed contributes five texts, so
+    # across-seed self-BLEU is not defined for it - the pool's own internal
+    # agreement is what analyze_sc reports as mean_sim.
+    for r in read("outputs/scsel_*.jsonl"):
+        if r.get("sc_selected") and isinstance(r.get("text"), str) and r["text"].strip():
+            texts[(r["model"], "sc_k5 (selected)", r["entity"])].append(r["text"])
     out = collections.defaultdict(dict)
     for (m, arm, ent), ts in texts.items():
         if len(ts) >= 2:
@@ -161,7 +169,7 @@ def main():
                       key=lambda a: -st.mean([d.get("support", 0.0)
                                               for d in pp[(model, a)].values()]))
         print(f"=== {model} " + "=" * 62)
-        print(f"{'arm':14s}{'n':>4s}{'support':>9s}{'calib':>8s}{'rep4':>7s}"
+        print(f"{'arm':20s}{'n':>4s}{'support':>9s}{'calib':>8s}{'rep4':>7s}"
               f"{'dist2':>7s}{'selfBLEU':>10s}{'ppl':>9s}{'words':>7s}{'cost':>7s}")
         # greedy = 1x, established before the loop: arms are printed in support
         # order, so computing it inline would leave it unset for the top rows
@@ -184,7 +192,7 @@ def main():
             T = correct(R, tpr, fpr)
             sbv = [x for x in rows[arm]["sb"] if x == x]
             flag = " <-0" if R <= fpr else ""
-            print(f"{arm:14s}{len(ents):4d}{R:9.3f}{T:8.3f}{st.mean(g('rep4')):7.3f}"
+            print(f"{arm:20s}{len(ents):4d}{R:9.3f}{T:8.3f}{st.mean(g('rep4')):7.3f}"
                   f"{st.mean(g('dist2')):7.3f}{(st.mean(sbv) if sbv else float('nan')):10.3f}"
                   f"{st.mean(g('ppl')):9.1f}{st.mean(g('words')):7.0f}"
                   f"{(st.mean(comp)/base if base else 1):6.2f}x{flag}")
@@ -194,7 +202,7 @@ def main():
             continue
         print(f"\n  paired bootstrap vs {REF}, over {len(rows[REF]['ents'])} prompts "
               f"(* = 95% CI excludes zero)")
-        print(f"  {'arm':14s}{'d support':>22s}{'d rep4':>22s}{'d dist2':>22s}")
+        print(f"  {'arm':20s}{'d support':>22s}{'d rep4':>22s}{'d dist2':>22s}")
         for arm in arms:
             if arm == REF:
                 continue
@@ -207,7 +215,7 @@ def main():
                     continue
                 d, lo, hi, sig = paired_ci(a, b, rng)
                 cells.append(f"{d:+7.3f} [{lo:+.3f},{hi:+.3f}]{sig}")
-            print(f"  {arm:14s}" + "".join(cells))
+            print(f"  {arm:20s}" + "".join(cells))
         print()
 
 
