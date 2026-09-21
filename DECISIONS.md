@@ -64,6 +64,13 @@ This file becomes the paper's Experimental Setup section.
             peripheral true facts the page omits, which would otherwise score
             as hallucination and bias the result toward our own hypothesis.
             Refusals are counted and reported as a separate column.
+            SUPERSEDED 2026-09-18 by the Stage 7 scheme. The labels actually
+            collected are entailment-style - supported / contradicted /
+            not_addressed - and the labeller judges only what the shown
+            evidence does with the claim, using no world knowledge. That makes
+            the task objective and fast, but it merges "true but absent" into
+            not_addressed. Consequence: reference coverage is NOT bounded by
+            the manual validation. It is reported as an open limitation.
 
 2026-09-07  Entities: FActScore's published list if obtainable; otherwise 100
             sampled in 3 strata by Wikipedia article length (~33 each).
@@ -335,10 +342,13 @@ re-verification.
   0.0183 -> 0.0402 across strata). GPT-2's macro rate moves +0.007 across the
   same pools while Llama-1b moves +0.227. Reported as bounded, not excluded:
   GPT-2's difference carries a 95% interval of roughly +-0.11.
-- **Reference coverage is NOT excluded** and cannot be by this design. The
-  stratum effect is "memorisation and/or coverage". The 100 manual labels are
-  therefore drawn **stratified across the three strata**, and the
-  "true but absent from page" rate per stratum bounds it directly.
+- **Reference coverage is NOT excluded, and is not bounded either.** The
+  stratum effect is "memorisation and/or coverage". The plan was to bound it
+  with a "true but absent from page" rate per stratum, but the Stage 7 labels
+  are entailment-style and use no world knowledge, so that category was never
+  collected - it is merged into `not_addressed`. Coverage remains an open
+  limitation and the stratum effect is reported as memorisation and/or
+  coverage, never as memorisation alone.
 - **The equal-pool re-verification pass is cancelled** — truncating pages would
   suppress pool size and coverage together, so shrinkage would be
   uninterpretable.
@@ -374,10 +384,13 @@ re-verification pass.
   effect the artifact is two orders of magnitude too small. The macro-rate
   control (GPT-2 flat, +0.008) corroborates but is weak alone: 95% CI
   [-0.114, +0.129].
-- **Reference coverage is NOT excluded** and cannot be by this design. The
-  stratum effect is "memorisation and/or coverage". The 100 manual labels are
-  drawn **stratified across the three strata**; the "true but absent from page"
-  rate per stratum bounds it directly.
+- **Reference coverage is NOT excluded, and is not bounded either.** The
+  stratum effect is "memorisation and/or coverage". The plan was to bound it
+  with a "true but absent from page" rate per stratum, but the Stage 7 labels
+  are entailment-style and use no world knowledge, so that category was never
+  collected - it is merged into `not_addressed`. Coverage remains an open
+  limitation and the stratum effect is reported as memorisation and/or
+  coverage, never as memorisation alone.
 - **The equal-pool re-verification pass is cancelled** — truncating pages would
   suppress pool size and coverage together, so shrinkage would be
   uninterpretable.

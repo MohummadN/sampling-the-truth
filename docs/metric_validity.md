@@ -108,11 +108,17 @@ belongs in Limitations.
   removes content, suppressing (1) and (2) together. Survival would have
   excluded (1); shrinkage would have been uninterpretable. The floor measurement
   answers the same question with more precision and no GPU cost.
-- **Mechanism (2) gets measured by the manual validation**, not by more compute.
-  `DECISIONS.md` (2026-09-07) already specifies three labels: supported,
-  unsupported, and *true but absent from the page*. Draw the 100 manual labels
-  **stratified across the three strata**, and the "true but absent" rate per
-  stratum is mechanism (2), measured directly.
+- **Mechanism (2) was to be bounded by the manual validation. It was not.**
+  The plan was a third label, *true but absent from the page*, whose rate per
+  stratum measures coverage directly. The scheme adopted on 18 September is
+  entailment-style instead - the labeller judges only what the shown evidence
+  does with the claim, with no world knowledge - which is objective and fast
+  but merges "true but absent" into `not_addressed`. A second pass over the 68
+  `not_addressed` rows was considered and rejected: after removing tautologies
+  and vague first-person sentences it would leave roughly 15 judgeable rows per
+  stratum, a rate carrying a confidence interval near +-25 points, far too wide
+  to speak to a 0.199 -> 0.426 stratum effect. **Coverage is therefore an open
+  limitation**, stated as such in the paper.
 - **Constraint on theta tuning.** The artifact lives precisely in the 0.1-0.5
   band, which grows 2.6% -> 6.4% with stratum. `DECISIONS.md` notes that moving
   theta from 0.15 to 0.95 reclassifies ~15% of sentences. **Keep theta at or
@@ -264,9 +270,14 @@ worse than the problem.
 
 ## Residual risks, stated plainly
 
-1. **Reference coverage (mechanism 2) is not excluded** and cannot be by this
-   design. The stratified manual labels will bound it; until then the stratum
-   effect is "memorisation and/or coverage", not memorisation alone.
+1. **Reference coverage (mechanism 2) is not excluded, and is not bounded.**
+   It cannot be excluded by this design, and the manual labels that were to
+   bound it turned out not to: the entailment-style scheme uses no world
+   knowledge and merges "true but absent" into `not_addressed`. A second pass
+   was considered and rejected as too imprecise to be worth it (~15 judgeable
+   rows per stratum, CI near +-25 points). **The stratum effect is reported as
+   "memorisation and/or coverage", never as memorisation alone**, and this is
+   the single largest open question about the factuality numbers.
 2. **158 temp1.3 records carry content that is never scored.** Excluding them is
    defensible, but temp1.3's support rate is measured on 82% of its outputs and
    that number must appear next to it.
@@ -383,16 +394,27 @@ systematically with scale and raw rates are not comparable across models
 without it. Noise caveat: generic % for GPT-2's weakest arms rests on few
 supported sentences.
 
-## Labelling the 'absent' category (17 September)
+## The 'absent' category, and why it was dropped (17-18 September)
 
-`absent` means the claim is TRUE of this person but does not appear in the
-page. A single retrieved evidence window cannot establish that, so
-`scripts/sample_for_labeling.py` writes the full pinned page for every sampled
-entity to `outputs/labeling_pages/` and the sheet carries a `page_file` column.
+The original scheme had a third label, `absent` - the claim is TRUE of this
+person but does not appear in the page - because that rate per stratum is what
+bounds reference coverage. A single retrieved window cannot establish absence,
+so `scripts/sample_for_labeling.py` dumps the full pinned page for every
+sampled entity to `outputs/labeling_pages/` and the sheet carries a
+`page_file` column. The pinned snapshot matters: the pages are `20231101.en`
+and live Wikipedia has moved on, so judging absence against the live site would
+measure a different corpus than the metric used.
 
-The pinned snapshot matters: the pages are `20231101.en`, and live Wikipedia
-has moved on. Judging absence against the live site would measure a different
-corpus than the metric used.
+**The scheme was then replaced.** The labels collected on 18 September are
+entailment-style - supported / contradicted / not_addressed - and
+`scripts/label.py` shows only the retrieved evidence, never the page, because
+the labeller is explicitly judging what the evidence does with the claim rather
+than whether the claim is true. That choice bought an objective, fast task with
+zero `unsure` rows out of 100, and it cost the coverage bound.
+
+The page dumps and the `page_file` column are retained but unused under the
+entailment scheme. They are what a coverage pass would need if one is ever
+run.
 
 ---
 

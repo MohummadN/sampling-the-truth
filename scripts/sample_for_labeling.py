@@ -12,12 +12,15 @@ Writes:
                               verifier verdict, sampling weight
   outputs/labeling_frame.json cell populations, for reweighting
 
-Label values: supported | unsupported | absent
-  supported   - the evidence shown establishes the claim
-  unsupported - the claim contradicts the evidence, or is not establishable
-  absent      - the claim is TRUE of this person but is not in the page
-The third value is what bounds the reference-coverage mechanism in
-docs/metric_validity.md; it cannot be recovered later, so use it carefully.
+Label values, as collected by scripts/label.py (entailment-style, superseding
+the supported | unsupported | absent scheme this docstring used to describe):
+  supported     - the evidence shown establishes the claim
+  contradicted  - the evidence shown says otherwise
+  not_addressed - the evidence neither establishes nor contradicts it
+The labeller uses no world knowledge, judging only what the shown evidence does
+with the claim. That merges "true but absent from the page" into not_addressed,
+so these labels do NOT bound reference coverage - see docs/metric_validity.md.
+The page dumps below are unused under this scheme and kept for a coverage pass.
 """
 import collections
 import csv
