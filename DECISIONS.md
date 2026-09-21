@@ -564,9 +564,17 @@ bootstrap.
             - GPT-2 supports a beam-vs-greedy comparison and nothing else. The
               "third scale point" is real for those two arms only; no claim
               about temperature or nucleus at 124M is supportable.
-            - compute_frontier's support-per-unit-compute column is meaningless
-              for floor arms - it divides a quantity that is not different from
-              zero - and is suppressed for them.
+            - Two floor tests, both reported and labelled. calibrate.py uses
+              the strict one - the 95% bootstrap CI includes zero - and that is
+              what the counts above refer to. compute_frontier uses the point
+              test, calibrated rate = 0.000, to suppress its
+              support-per-unit-compute column, since dividing a quantity that
+              is not different from zero is meaningless. The point test is
+              weaker, so a few arms are priced on the frontier that calibrate.py
+              still calls indistinguishable from zero; gpt2 dola_nucleus is the
+              example, raw 0.052 against a floor of 0.041 but CI [0.000, 0.043].
+            - Both scripts import src/metrics/calibration.py, so they cannot
+              disagree about where the floor sits.
             - The floor is a statement about PRECISION, not level: llama-1b
               greedy and nucleus0.9 both calibrate to 0.050, but greedy's CI is
               [0.000, 0.117] and nucleus0.9's is [0.005, 0.078], so only greedy

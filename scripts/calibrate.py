@@ -18,7 +18,6 @@ comparison stays paired.
 """
 import argparse
 import collections
-import csv
 import glob
 import json
 import os
@@ -26,8 +25,10 @@ import random
 
 from src.data import reported_entities
 
-LAB, KEY = "outputs/labels.csv", "outputs/labeling_key.csv"
-THETA, B = 0.5, 2000
+from src.metrics.calibration import correct, load_labels, rates
+
+B = 2000
+THETA = 0.5
 # Reported numbers are the 80 test entities (DECISIONS 2026-09-07). The
 # labels themselves come from dev, so TPR/FPR are estimated on one split and
 # applied to the other - which is the point of a prevalence-independent
@@ -35,38 +36,6 @@ THETA, B = 0.5, 2000
 SPLIT = os.environ.get("SPLIT", "test")
 KEEP = reported_entities()
 MODELS = ("gpt2", "llama-1b", "llama-3b")
-
-
-def load_labels():
-    lab = {r["id"]: r for r in csv.DictReader(open(LAB, encoding="utf-8"))}
-    key = {r["id"]: r for r in csv.DictReader(open(KEY, encoding="utf-8"))}
-    rows = []
-    for i, l in lab.items():
-        if l["label"] == "unsure":
-            continue
-        k = key[i]
-        rows.append({"h": l["label"] == "supported",
-                     "v": float(k["p_entail"]) >= THETA,
-                     "w": float(k["weight"]),
-                     "s": str(k["stratum"])})
-    return rows
-
-
-def rates(rows):
-    pos = sum(r["w"] for r in rows if r["h"])
-    neg = sum(r["w"] for r in rows if not r["h"])
-    tp = sum(r["w"] for r in rows if r["h"] and r["v"])
-    fp = sum(r["w"] for r in rows if not r["h"] and r["v"])
-    return (tp / pos if pos else None, fp / neg if neg else None)
-
-
-def correct(R, tpr, fpr):
-    if tpr is None or fpr is None:
-        return None
-    d = tpr - fpr
-    if d <= 0:
-        return None
-    return min(1.0, max(0.0, (R - fpr) / d))
 
 
 def load_observed():

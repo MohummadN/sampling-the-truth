@@ -69,3 +69,21 @@ def test_reported_entities_honours_the_env_override(monkeypatch):
     assert len(reported_entities()) == 20
     monkeypatch.delenv("SPLIT")
     assert len(reported_entities()) == 80
+
+
+def test_calibration_reproduces_the_reported_rates():
+    """TPR/FPR and the Rogan-Gladen line are quoted in DECISIONS and the paper.
+    If the labels or the join ever change, these move silently."""
+    from src.metrics.calibration import correct, floor, load_labels, rates
+    rows = load_labels()
+    assert len(rows) == 100
+    tpr, fpr = rates(rows)
+    assert round(tpr, 3) == 0.947
+    assert round(fpr, 3) == 0.041
+    assert round(floor(rows), 3) == 0.041
+    # the published examples
+    assert round(correct(0.213, tpr, fpr), 3) == 0.189
+    assert round(correct(0.130, tpr, fpr), 3) == 0.098
+    # at or below the floor calibrates to exactly zero, never negative
+    assert correct(0.041, tpr, fpr) == 0.0
+    assert correct(0.001, tpr, fpr) == 0.0

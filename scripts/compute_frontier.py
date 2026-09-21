@@ -12,6 +12,7 @@ import os
 import statistics as st
 
 from src.data import reported_entities
+from src.metrics.calibration import correct, load_labels, rates
 
 SPLIT = os.environ.get("SPLIT", "test")
 KEEP = reported_entities()
@@ -60,7 +61,10 @@ for k, d in rates.items():
     sc[k[0]]["sc_k5 (one sample)"].append(st.mean(v))
     sc[k[0]]["sc_k5 (oracle best-5)"].append(max(v))
 
+TPR, FPR = rates(load_labels())
+
 print(f"reporting split: {SPLIT} ({len(KEEP)} entities)")
+print(f"calibrated with TPR {TPR:.3f}, FPR {FPR:.3f}; per-1x uses the calibrated rate")
 
 for model in ("gpt2", "llama-1b", "llama-3b"):
     base = st.mean(comp[(model, "greedy")])
@@ -75,7 +79,18 @@ for model in ("gpt2", "llama-1b", "llama-3b"):
     rows.sort(key=lambda r: r[2])
 
     print(f"\n{model}")
-    print(f"{'arm':22s} {'n':>4s} {'compute':>8s} {'support':>8s} {'per 1x':>8s}")
-    print("-" * 54)
+    print(f"{'arm':22s} {'n':>4s} {'compute':>8s} {'raw':>7s} {'calib':>7s} {'per 1x':>8s}")
+    print("-" * 62)
     for arm, n, c, s in rows:
-        print(f"{arm:22s} {n:4d} {c:7.2f}x {s:8.3f} {s / c:8.3f}")
+        T = correct(s, TPR, FPR)
+        # Below the false-positive floor the calibrated rate is not different
+        # from zero, so support-per-unit-compute would divide a quantity that
+        # is not there. Suppressed rather than printed as a small number.
+        per = "       -" if s <= FPR else f"{T / c:8.3f}"
+        flag = "  <- calibrates to zero" if s <= FPR else ""
+        print(f"{arm:22s} {n:4d} {c:7.2f}x {s:7.3f} {T:7.3f} {per}{flag}")
+
+print("\nper-1x is suppressed where the calibrated rate is 0.000 - dividing a")
+print("quantity that is not different from zero. scripts/calibrate.py applies a")
+print("stricter test, flagging arms whose 95% bootstrap CI includes zero, so a")
+print("few arms priced here are still not distinguishable from zero there.")
