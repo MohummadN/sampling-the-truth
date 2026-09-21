@@ -10,6 +10,19 @@ the dev labels transfer to the test arms:
 
 One definition, imported by scripts/calibrate.py and scripts/compute_frontier.py,
 so the two can never disagree about where the false-positive floor sits.
+
+The correction is AFFINE in R, which answers an objection worth pre-empting:
+applying it to the macro mean over entities is identical to correcting each
+entity and averaging, so reporting a macro rate costs nothing in correctness.
+Verified numerically on unequal per-entity sentence counts; the two agree to
+machine precision. The micro (sentence-pooled) rate differs, but that is a
+different estimand - the average sentence rather than the average entity - and
+the paired bootstrap runs over prompts, so macro is the reported one.
+
+The residual approximation is weighting, not averaging: TPR and FPR are
+estimated sentence-weighted from the label frame and applied to an
+entity-weighted rate. Error rates do vary across strata, which is why
+scripts/calibrate.py also reports TPR/FPR and calibrated rates per stratum.
 """
 from __future__ import annotations
 

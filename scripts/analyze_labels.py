@@ -2,8 +2,9 @@
 """Verifier validation and theta tuning against the 100 manual labels.
 
 Joins outputs/labels.csv to outputs/labeling_key.csv. Every estimate is
-weighted by the sampling weight, so numbers refer to the full 51,973-sentence
-frame rather than to the stratified sample.
+weighted by the sampling weight, so numbers refer to the full 8,382-sentence
+frame (dev entities, claim-like sentences, deduplicated) rather than to the
+stratified sample. The count comes from outputs/labeling_frame.json.
 
 Human labels collapse to binary the way the verifier's output is binary:
   supported                      -> supported
@@ -89,9 +90,8 @@ def main():
     for i in range(1, 20):
         th = i / 20
         m = metrics(rows, th)
-        star = ""
         if best is None or m["bal"] > best[1]["bal"]:
-            best, star = (th, m), ""
+            best = (th, m)
         print(f"  {th:6.2f} {m['acc']:9.3f} {m['bal']:9.3f} {m['prec']:10.3f} {m['rec']:8.3f}")
     print(f"\n  best balanced accuracy at theta = {best[0]:.2f}")
 
