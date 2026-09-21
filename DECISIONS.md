@@ -551,3 +551,26 @@ bootstrap.
             already-adjusted rates would over-correct by the overlap above.
             Not done, and no combined number is reported.
 
+2026-09-21  Arms at the false-positive floor are reported as indistinguishable
+            from zero true support, and no comparison is drawn between them.
+            Calibrated on the test split, with a 95% bootstrap CI whose lower
+            bound touching zero is the test:
+              gpt2      6 of 8   only beam4 0.189 [0.088, 0.292] and greedy
+                                 0.098 [0.021, 0.178] clear the floor
+              llama-1b  4 of 8   greedy, dola, greedy_reppen, temp1.3
+              llama-3b  3 of 8   nucleus0.9, greedy_reppen, temp1.3
+            (sc_k5 is scored separately and is not in this table.)
+            Consequences that bind the write-up:
+            - GPT-2 supports a beam-vs-greedy comparison and nothing else. The
+              "third scale point" is real for those two arms only; no claim
+              about temperature or nucleus at 124M is supportable.
+            - compute_frontier's support-per-unit-compute column is meaningless
+              for floor arms - it divides a quantity that is not different from
+              zero - and is suppressed for them.
+            - The floor is a statement about PRECISION, not level: llama-1b
+              greedy and nucleus0.9 both calibrate to 0.050, but greedy's CI is
+              [0.000, 0.117] and nucleus0.9's is [0.005, 0.078], so only greedy
+              is flagged. Per-entity variance, not a smaller effect.
+            - beam4 clears the floor in all three models (0.189 / 0.276 /
+              0.249) and is the only arm that does.
+
