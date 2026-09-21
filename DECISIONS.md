@@ -523,3 +523,31 @@ bootstrap.
   than an ordering.
 - `TOP_M` stays at 5 for all headline numbers; this sweep is reported as the
   sensitivity check.
+
+2026-09-21  Genericity adjustment and Rogan-Gladen calibration are reported
+            side by side and are NEVER multiplied.
+            They look like the same correction - both remove verifier
+            over-firing - so the overlap was measured at sentence level rather
+            than assumed. Joining the 100 manual labels to the mismatch control
+            on (model, arm, seed, entity, sentence), all 60 verifier-supported
+            labelled rows matched: the generic share is 11.1% among the 36
+            human-judged false positives and 4.2% among the 24 true positives
+            (weighted 4.7% and 1.3%). Genericity therefore removes only about a
+            tenth of the errors calibration corrects. The two are near
+            independent because they catch different failures: calibration
+            catches the verifier over-firing relative to a human reading the
+            SAME evidence, genericity catches a claim that is not specific to
+            THIS person.
+            Reporting hierarchy, settled:
+              - raw           - reported for FActScore comparability
+              - calibrated    - PRIMARY for levels; human-validated and
+                                prevalence-independent, so it transfers across
+                                arms and strata
+              - adjusted      - PRIMARY for cross-model comparison; it is what
+                                carries the scale story, 56.0 / 9.9 / 3.6
+            Composing them would need TPR and FPR re-estimated under the
+            adjusted definition of "verifier supported", because the present
+            rates were estimated on the unadjusted population; applying them to
+            already-adjusted rates would over-correct by the overlap above.
+            Not done, and no combined number is reported.
+
