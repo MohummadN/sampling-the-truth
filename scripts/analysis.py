@@ -70,6 +70,50 @@ def per_prompt():
         if c:
             acc[(r["model"], r["decoding"])][r["entity"]]["compute"].append(c)
 
+    # sc_k5 needs assembling. Its parent record carries samples rather than
+    # text, so metrics_* has no row for it and verdicts_* excludes it; left
+    # alone every field would default to 0.0 and invent an arm out of nothing.
+    # The selected sample IS the arm; the mean over five is what one sample of
+    # the same sampler buys, and the cost of both comes from the parent.
+    sel = {}
+    for r in read("outputs/scchoice_*.jsonl"):
+        sel[(r["model"], r["seed"], r["entity"])] = r.get("selected_index")
+    sup = collections.defaultdict(dict)
+    for r in read("outputs/scverdicts_*.jsonl"):
+        j = int(r["decoding"].split("#")[1])
+        v = r["support_rate"]
+        sup[(r["model"], r["seed"], r["entity"])][j] = 0.0 if v is None else v
+    met = collections.defaultdict(dict)
+    for r in read("outputs/metrics_*.jsonl"):
+        if not str(r["decoding"]).startswith("sc_k5#"):
+            continue
+        met[(r["model"], r["seed"], r["entity"])][int(r["decoding"].split("#")[1])] = r
+
+    for (m, seed, ent), per_j in sup.items():
+        chosen = sel.get((m, seed, ent))
+        rows_j = met.get((m, seed, ent), {})
+        cost = acc[(m, "sc_k5")][ent]["compute"]
+        for label, js in (("sc_k5 (selected)", [chosen] if chosen in per_j else []),
+                          ("sc_k5 (one sample)", sorted(per_j))):
+            if not js:
+                continue
+            d = acc[(m, label)][ent]
+            d["support"].append(st.mean([per_j[j] for j in js]))
+            for src, dst in (("rep_4_prefix", "rep4"), ("distinct_2_prefix", "dist2"),
+                             ("loop_severity_prefix", "loop"), ("perplexity", "ppl"),
+                             ("n_words", "words")):
+                vals = [rows_j[j][src] for j in js
+                        if j in rows_j and rows_j[j].get(src) is not None]
+                if vals:
+                    d[dst].append(st.mean(vals))
+            if cost:
+                c = st.mean(cost)
+                d["compute"].append(c / 5 if "one sample" in label else c)
+
+    # the raw pieces are now represented by the two assembled rows
+    for k in [k for k in acc if k[1] == "sc_k5" or str(k[1]).startswith("sc_k5#")]:
+        del acc[k]
+
     return {k: {e: {m: st.mean(v) for m, v in d.items()}
                 for e, d in ents.items()} for k, ents in acc.items()}
 
@@ -127,6 +171,11 @@ def main():
         for arm in arms:
             ents = sorted(set(pp[(model, arm)]) & KEEP)
             g = lambda m, default=0.0: [pp[(model, arm)][e].get(m, default) for e in ents]
+            for metric in ("support", "rep4", "dist2", "ppl"):
+                have = sum(1 for e in ents if metric in pp[(model, arm)][e])
+                if have < len(ents):
+                    print(f"  ! {arm}: {metric} missing for {len(ents)-have} of "
+                          f"{len(ents)} prompts, counted as 0.0")
             sup, comp = g("support"), g("compute")
             rows[arm] = {"ents": ents, "support": sup, "rep4": g("rep4"),
                          "dist2": g("dist2"), "ppl": g("ppl"),
