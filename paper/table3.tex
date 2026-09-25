@@ -1,0 +1,26 @@
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{lr}
+    \toprule
+    \textbf{Quantity} & \textbf{Value} \\
+    \midrule
+    Labelled sentences & 100 \\
+    \quad supported & 25 \\
+    \quad contradicted & 7 \\
+    \quad not addressed & 68 \\
+    \midrule
+    Sensitivity (TPR) & 0.947 \\
+    False-positive rate & 0.041 \\
+    Precision & 0.582 \\
+    Balanced accuracy & 0.953 \\
+    \midrule
+    False positives & 36 \\
+    \quad human-labelled \emph{not addressed} & 34 \\
+    \quad human-labelled \emph{contradicted} & 2 \\
+    False negatives & 1 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Verifier validation at $\theta=0.5$ against 100 blind human labels, stratified by entity stratum and entailment-probability band and reweighted to the full frame. The verifier is high-recall and low-precision: it almost never misses a supported sentence, but confidently entails claims the retrieved evidence does not address --- the neutral trap. Balanced accuracy peaks at $\theta=0.55$ (0.956) against 0.953 at $\theta=0.5$, so the pre-registered threshold is retained.}
+  \label{tab:verifier}
+\end{table}

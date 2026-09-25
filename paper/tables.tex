@@ -1,0 +1,59 @@
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{lrrrrrr}
+    \toprule
+    \textbf{Stratum} & \textbf{$n$} & \textbf{dev} & \textbf{test} & \textbf{min} & \textbf{med} & \textbf{max} \\
+    \midrule
+    0 & 34 & 7 & 27 & 20 & 28 & 47 \\
+    1 & 33 & 7 & 26 & 31 & 54 & 120 \\
+    2 & 33 & 6 & 27 & 61 & 166 & 659 \\
+    \midrule
+    all & 100 & 20 & 80 & & & \\
+    \bottomrule
+  \end{tabular}
+  \caption{Entity pool. Strata are formed by Wikipedia page length; \textbf{min}, \textbf{med} and \textbf{max} are page sentences. The grid produces 8,100 generations (3 models $\times$ 9 configurations $\times$ 3 seeds $\times$ 100 prompts); all reported results use the test split.}
+  \label{tab:data}
+\end{table}
+
+\begin{table*}[t]
+  \centering
+  \small
+  \begin{tabular}{ll rrrr r}
+    \toprule
+    \textbf{Model} & \textbf{Configuration} & \textbf{Support} & \textbf{Calibrated} & \textbf{Distinct-2} & \textbf{Rep-4} & \textbf{Compute} \\
+    \midrule
+    GPT-2 (124M) & beam-4 & 0.213 & 0.189 & 0.149 & 0.827 & 3.55$\times$ \\
+     & greedy & 0.130 & 0.098 & 0.140 & 0.833 & 1.00$\times$ \\
+     & DoLa+nuc & 0.052 & 0.012 & 0.322 & 0.605 & 0.99$\times$ \\
+     & T=0.7 & 0.028 & 0.000$^{\dagger}$ & 0.805 & 0.085 & 0.97$\times$ \\
+     & DoLa & 0.023 & 0.000$^{\dagger}$ & 0.550 & 0.346 & 0.98$\times$ \\
+     & greedy+rp & 0.022 & 0.000$^{\dagger}$ & 1.000 & 0.000 & 0.74$\times$ \\
+     & T=1.3 & 0.021 & 0.000$^{\dagger}$ & 0.999 & 0.000 & 0.95$\times$ \\
+     & SC k=5 & 0.021 & 0.000$^{\dagger}$ & 0.961 & 0.004 & 4.57$\times$ \\
+     & nucleus & 0.015 & 0.000$^{\dagger}$ & 0.959 & 0.008 & 0.92$\times$ \\
+    \midrule
+    Llama-3.2-1B & beam-4 & 0.292 & 0.276 & 0.373 & 0.548 & 3.58$\times$ \\
+     & DoLa+nuc & 0.163 & 0.134 & 0.726 & 0.154 & 0.88$\times$ \\
+     & T=0.7 & 0.129 & 0.097 & 0.772 & 0.121 & 0.89$\times$ \\
+     & SC k=5 & 0.105 & 0.071 & 0.919 & 0.023 & 4.33$\times$ \\
+     & greedy & 0.087 & 0.050 & 0.298 & 0.645 & 1.00$\times$ \\
+     & nucleus & 0.087 & 0.050 & 0.925 & 0.020 & 0.84$\times$ \\
+     & DoLa & 0.060 & 0.020 & 0.938 & 0.014 & 0.78$\times$ \\
+     & greedy+rp & 0.037 & 0.000$^{\dagger}$ & 0.994 & 0.000 & 0.77$\times$ \\
+     & T=1.3 & 0.033 & 0.000$^{\dagger}$ & 1.000 & 0.000 & 1.06$\times$ \\
+    \midrule
+    Llama-3.2-3B & beam-4 & 0.267 & 0.249 & 0.569 & 0.350 & 3.53$\times$ \\
+     & DoLa+nuc & 0.161 & 0.132 & 0.773 & 0.122 & 0.93$\times$ \\
+     & DoLa & 0.147 & 0.117 & 0.948 & 0.014 & 0.84$\times$ \\
+     & T=0.7 & 0.137 & 0.105 & 0.832 & 0.069 & 0.93$\times$ \\
+     & SC k=5 & 0.119 & 0.085 & 0.914 & 0.024 & 4.55$\times$ \\
+     & greedy & 0.101 & 0.066 & 0.513 & 0.399 & 1.00$\times$ \\
+     & nucleus & 0.082 & 0.045 & 0.915 & 0.030 & 0.95$\times$ \\
+     & greedy+rp & 0.068 & 0.030 & 0.988 & 0.001 & 0.77$\times$ \\
+     & T=1.3 & 0.027 & 0.000$^{\dagger}$ & 0.999 & 0.000 & 1.13$\times$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Main results on the test split, ordered by support rate. \textbf{Calibrated} applies the Rogan--Gladen correction using the verifier's measured sensitivity (0.947) and false-positive rate (0.041) from 100 human labels; $\dagger$ marks arms at or below the false-positive floor, indistinguishable from zero true support. Diversity and repetition are computed over the first 128 tokens to remove the length confound. Compute is generated tokens $\times$ beams ($\times$ samples), relative to greedy.}
+  \label{tab:main}
+\end{table*}

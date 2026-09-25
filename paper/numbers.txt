@@ -1,0 +1,344 @@
+### compute_frontier
+reporting split: test (80 entities)
+calibrated with TPR 0.947, FPR 0.041; per-1x uses the calibrated rate
+
+gpt2
+arm                       n  compute     raw   calib   per 1x
+--------------------------------------------------------------
+greedy_reppen           240    0.74x   0.022   0.000        -  <- calibrates to zero
+sc_k5 (one sample)      240    0.91x   0.020   0.000        -  <- calibrates to zero
+nucleus0.9              240    0.92x   0.015   0.000        -  <- calibrates to zero
+temp1.3                 240    0.95x   0.021   0.000        -  <- calibrates to zero
+temp0.7                 240    0.97x   0.028   0.000        -  <- calibrates to zero
+dola                    240    0.98x   0.023   0.000        -  <- calibrates to zero
+dola_nucleus            240    0.99x   0.052   0.012    0.012
+greedy                  240    1.00x   0.130   0.098    0.098
+beam4                   240    3.55x   0.213   0.189    0.053
+sc_k5 (selected)        240    4.57x   0.021   0.000        -  <- calibrates to zero
+sc_k5 (oracle best-5)   240    4.57x   0.069   0.030    0.007
+
+llama-1b
+arm                       n  compute     raw   calib   per 1x
+--------------------------------------------------------------
+greedy_reppen           240    0.77x   0.037   0.000        -  <- calibrates to zero
+dola                    240    0.78x   0.060   0.020    0.026
+nucleus0.9              240    0.84x   0.087   0.050    0.060
+sc_k5 (one sample)      240    0.87x   0.077   0.039    0.045
+dola_nucleus            240    0.88x   0.163   0.134    0.153
+temp0.7                 240    0.89x   0.129   0.097    0.108
+greedy                  240    1.00x   0.087   0.050    0.050
+temp1.3                 240    1.06x   0.033   0.000        -  <- calibrates to zero
+beam4                   240    3.58x   0.292   0.276    0.077
+sc_k5 (selected)        240    4.33x   0.105   0.071    0.016
+sc_k5 (oracle best-5)   240    4.33x   0.223   0.201    0.046
+
+llama-3b
+arm                       n  compute     raw   calib   per 1x
+--------------------------------------------------------------
+greedy_reppen           240    0.77x   0.068   0.030    0.039
+dola                    240    0.84x   0.147   0.117    0.139
+sc_k5 (one sample)      240    0.91x   0.089   0.053    0.058
+temp0.7                 240    0.93x   0.137   0.105    0.113
+dola_nucleus            240    0.93x   0.161   0.132    0.141
+nucleus0.9              240    0.95x   0.082   0.045    0.047
+greedy                  240    1.00x   0.101   0.066    0.066
+temp1.3                 240    1.13x   0.027   0.000        -  <- calibrates to zero
+beam4                   240    3.53x   0.267   0.249    0.071
+sc_k5 (selected)        240    4.55x   0.119   0.085    0.019
+sc_k5 (oracle best-5)   240    4.55x   0.248   0.228    0.050
+
+per-1x is suppressed where the calibrated rate is 0.000 - dividing a
+quantity that is not different from zero. scripts/calibrate.py applies a
+stricter test, flagging arms whose 95% bootstrap CI includes zero, so a
+few arms priced here are still not distinguishable from zero there.
+
+### calibrate
+reporting split: test (80 entities); labels are from dev
+verifier at theta=0.5: TPR 0.947  FPR 0.041  (n=100 labels)
+calibration: T = (R - 0.041) / (0.947 - 0.041)  ->  T ~ 1.10 R - 0.046
+false-positive floor: any arm at or below R = 0.041 is indistinguishable from zero true support
+
+
+gpt2
+  arm                raw  calibrated             95% CI
+  ------------------------------------------------------
+  beam4            0.213       0.189 [0.088, 0.292]
+  greedy           0.130       0.098 [0.021, 0.178]
+  dola_nucleus     0.052       0.012 [0.000, 0.043]   <- at the FP floor
+  temp0.7          0.028       0.000 [0.000, 0.012]   <- at the FP floor
+  dola             0.023       0.000 [0.000, 0.008]   <- at the FP floor
+  greedy_reppen    0.022       0.000 [0.000, 0.007]   <- at the FP floor
+  temp1.3          0.021       0.000 [0.000, 0.006]   <- at the FP floor
+  nucleus0.9       0.015       0.000 [0.000, 0.000]   <- at the FP floor
+
+llama-1b
+  arm                raw  calibrated             95% CI
+  ------------------------------------------------------
+  beam4            0.292       0.276 [0.179, 0.381]
+  dola_nucleus     0.163       0.134 [0.082, 0.185]
+  temp0.7          0.129       0.097 [0.048, 0.137]
+  greedy           0.087       0.050 [0.000, 0.117]   <- at the FP floor
+  nucleus0.9       0.087       0.050 [0.005, 0.078]
+  dola             0.060       0.020 [0.000, 0.053]   <- at the FP floor
+  greedy_reppen    0.037       0.000 [0.000, 0.030]   <- at the FP floor
+  temp1.3          0.033       0.000 [0.000, 0.024]   <- at the FP floor
+
+llama-3b
+  arm                raw  calibrated             95% CI
+  ------------------------------------------------------
+  beam4            0.267       0.249 [0.166, 0.340]
+  dola_nucleus     0.161       0.132 [0.081, 0.181]
+  dola             0.147       0.117 [0.060, 0.168]
+  temp0.7          0.137       0.105 [0.056, 0.148]
+  greedy           0.101       0.066 [0.007, 0.122]
+  nucleus0.9       0.082       0.045 [0.000, 0.080]   <- at the FP floor
+  greedy_reppen    0.068       0.030 [0.000, 0.066]   <- at the FP floor
+  temp1.3          0.027       0.000 [0.000, 0.013]   <- at the FP floor
+
+
+per-stratum calibration, arm = beam4
+  model      str    TPR    FPR     raw  calibrated
+  --------------------------------------------------
+  gpt2         0  1.000  0.017   0.192       0.177
+  gpt2         1  1.000  0.033   0.259       0.234
+  gpt2         2  0.917  0.079   0.189       0.132
+  llama-1b     0  1.000  0.017   0.211       0.197
+  llama-1b     1  1.000  0.033   0.231       0.205
+  llama-1b     2  0.917  0.079   0.431       0.420
+  llama-3b     0  1.000  0.017   0.214       0.200
+  llama-3b     1  1.000  0.033   0.243       0.217
+  llama-3b     2  0.917  0.079   0.342       0.314
+
+### analyze_sc
+reporting split: test (80 entities)
+entities with fewer than 5 scored samples: 0
+entities dropped for a missing selection: 0
+
+model         n    pool      sc  oracle   worst  sc-pool  headroom
+------------------------------------------------------------------
+gpt2        240   0.020   0.021   0.069   0.000   +0.001     0.048
+llama-1b    240   0.077   0.105   0.223   0.005   +0.028     0.118
+llama-3b    240   0.089   0.119   0.248   0.005   +0.029     0.129
+
+### analyze_mismatch
+reporting split: test (80 entities)
+mismatch coverage: 6717/6717 supported sentences scored (100.0%)
+
+model      arm               n     raw  adjusted    drop  generic %
+------------------------------------------------------------------
+gpt2       beam4           240   0.201     0.052  -0.149      56.0%
+gpt2       greedy          240   0.136     0.092  -0.044      33.7%
+gpt2       dola_nucleus    240   0.033     0.014  -0.018      48.8%
+gpt2       temp0.7         240   0.026     0.018  -0.007      31.4%
+gpt2       greedy_reppen   240   0.015     0.015  +0.000       0.0%
+gpt2       nucleus0.9      240   0.010     0.008  -0.002      16.7%
+gpt2       temp1.3         240   0.008     0.008  +0.000       0.0%
+gpt2       dola            240   0.006     0.006  +0.000       0.0%
+
+llama-1b   beam4           240   0.271     0.239  -0.033       9.9%
+llama-1b   dola_nucleus    240   0.131     0.112  -0.018      13.3%
+llama-1b   temp0.7         240   0.112     0.102  -0.010       8.0%
+llama-1b   greedy          240   0.084     0.083  -0.001       0.7%
+llama-1b   nucleus0.9      240   0.075     0.068  -0.007      10.7%
+llama-1b   dola            240   0.059     0.053  -0.006       8.7%
+llama-1b   greedy_reppen   240   0.038     0.038  +0.000       0.0%
+llama-1b   temp1.3         240   0.031     0.031  +0.000       0.0%
+
+llama-3b   beam4           240   0.256     0.248  -0.008       3.6%
+llama-3b   dola_nucleus    240   0.149     0.139  -0.010       7.9%
+llama-3b   dola            240   0.139     0.130  -0.010       6.5%
+llama-3b   temp0.7         240   0.125     0.118  -0.008       6.0%
+llama-3b   greedy          240   0.090     0.084  -0.006       2.6%
+llama-3b   nucleus0.9      240   0.074     0.064  -0.010      18.5%
+llama-3b   greedy_reppen   240   0.065     0.063  -0.003       3.6%
+llama-3b   temp1.3         240   0.025     0.025  +0.000       0.0%
+
+
+### analyze_labels
+labels: 100   usable: 100   unsure (excluded): 0
+
+human label distribution
+  contradicted      7 raw    20.8% reweighted to frame
+  not_addressed    68 raw    73.4% reweighted to frame
+  supported        25 raw     5.7% reweighted to frame
+
+notes
+  partial          23
+  fragment         11
+  firstperson       6
+  contradiction     4
+  tablechunk        2
+  place             2
+  generic           1
+
+theta sweep (weighted)
+   theta  accuracy  balanced  precision   recall
+    0.05     0.726     0.855      0.173    1.000
+    0.10     0.855     0.923      0.283    1.000
+    0.15     0.882     0.913      0.320    0.947
+    0.20     0.907     0.926      0.376    0.947
+    0.25     0.928     0.937      0.440    0.947
+    0.30     0.940     0.943      0.488    0.947
+    0.35     0.952     0.950      0.547    0.947
+    0.40     0.955     0.951      0.564    0.947
+    0.45     0.958     0.953      0.582    0.947
+    0.50     0.958     0.953      0.582    0.947
+    0.55     0.963     0.956      0.616    0.947
+    0.60     0.964     0.950      0.626    0.935
+    0.65     0.965     0.951      0.632    0.935
+    0.70     0.966     0.942      0.640    0.914
+    0.75     0.967     0.942      0.652    0.914
+    0.80     0.964     0.910      0.641    0.849
+    0.85     0.967     0.899      0.672    0.822
+    0.90     0.968     0.900      0.686    0.822
+    0.95     0.976     0.904      0.777    0.822
+
+  best balanced accuracy at theta = 0.55
+
+--- theta = 0.50 ----------------------------------------
+  confusion (raw counts)     human sup   human not
+    verifier supported              24          36
+    verifier not supported           1          39
+  weighted: accuracy 0.958  balanced 0.953  precision 0.582  recall 0.947  specificity 0.959  F1 0.721
+
+--- theta = 0.55 ----------------------------------------
+  confusion (raw counts)     human sup   human not
+    verifier supported              24          28
+    verifier not supported           1          47
+  weighted: accuracy 0.963  balanced 0.956  precision 0.616  recall 0.947  specificity 0.964  F1 0.747
+
+agreement by stratum (theta = 0.50, weighted)
+  stratum 0  n= 33  accuracy 0.983  balanced 0.991
+  stratum 1  n= 34  accuracy 0.969  balanced 0.983
+  stratum 2  n= 33  accuracy 0.921  balanced 0.919
+
+what the verifier gets wrong at theta = 0.50
+  false positives: 36  (Counter({'not_addressed': 34, 'contradicted': 2}))
+  false negatives: 1
+  FP mean p_entail 0.754
+  FN mean p_entail 0.121
+
+### dedup_probe
+reporting split: test (80 entities)
+sentence key 'sentence', supported key 'supported'
+
+arm                n     raw   dedup   delta  dup frac
+temp0.7          702   0.090   0.090  +0.000     0.081
+nucleus0.9       703   0.054   0.054  +0.000     0.013
+temp1.3          553   0.028   0.028  +0.000     0.000
+greedy_reppen    702   0.040   0.040  +0.000     0.000
+dola_nucleus     636   0.118   0.118  -0.000     0.227
+dola             651   0.076   0.076  -0.000     0.033
+greedy           666   0.112   0.118  -0.007     0.611
+beam4            675   0.259   0.285  -0.026     0.532
+
+### compare_topm
+model      arm              n    top5   top20   delta             95% CI
+--------------------------------------------------------------------------
+gpt2       beam4           20   0.116   0.141  +0.025 [+0.000, +0.075]
+gpt2       dola            20   0.045   0.067  +0.022 [+0.000, +0.054]
+gpt2       dola_nucleus    20   0.079   0.107  +0.029 [+0.008, +0.053]  *
+gpt2       greedy          20   0.032   0.082  +0.050 [+0.000, +0.150]
+gpt2       greedy_reppen   20   0.006   0.014  +0.008 [+0.000, +0.025]
+gpt2       nucleus0.9      20   0.015   0.033  +0.018 [+0.005, +0.034]  *
+gpt2       temp0.7         20   0.024   0.041  +0.017 [+0.005, +0.032]  *
+gpt2       temp1.3         20   0.000   0.008  +0.008 [+0.000, +0.021]
+llama-1b   beam4           20   0.277   0.318  +0.041 [+0.004, +0.095]  *
+llama-1b   dola            20   0.077   0.120  +0.043 [+0.004, +0.092]  *
+llama-1b   dola_nucleus    20   0.183   0.209  +0.026 [+0.015, +0.038]  *
+llama-1b   greedy          20   0.151   0.152  +0.002 [+0.000, +0.005]
+llama-1b   greedy_reppen   20   0.050   0.063  +0.013 [+0.000, +0.034]
+llama-1b   nucleus0.9      20   0.084   0.103  +0.019 [+0.008, +0.033]  *
+llama-1b   temp0.7         20   0.142   0.174  +0.031 [+0.013, +0.053]  *
+llama-1b   temp1.3         20   0.021   0.032  +0.012 [+0.000, +0.035]
+llama-3b   beam4           20   0.294   0.318  +0.024 [+0.000, +0.058]
+llama-3b   dola            20   0.122   0.131  +0.009 [+0.000, +0.023]
+llama-3b   dola_nucleus    20   0.161   0.211  +0.051 [+0.025, +0.081]  *
+llama-3b   greedy          20   0.117   0.125  +0.007 [+0.000, +0.021]
+llama-3b   greedy_reppen   20   0.093   0.129  +0.036 [+0.005, +0.077]  *
+llama-3b   nucleus0.9      20   0.097   0.127  +0.030 [+0.019, +0.040]  *
+llama-3b   temp0.7         20   0.130   0.146  +0.016 [+0.003, +0.035]  *
+llama-3b   temp1.3         20   0.023   0.025  +0.002 [+0.000, +0.007]
+
+mean shift across arms: +0.022   spread (sd): 0.014
+* = 95% CI excludes zero. A uniform positive shift means top-5 costs level but not ranking.
+
+### analysis
+reporting split: test (80 entities); seeds averaged within prompt; reference arm nucleus0.9
+calibration TPR 0.947 FPR 0.041; arms at or below R=0.041 calibrate to zero
+
+=== gpt2 ==============================================================
+arm                    n  support   calib   rep4  dist2  selfBLEU      ppl  words   cost
+beam4                 80    0.213   0.189  0.827  0.149     1.000      1.7    142  3.55x
+greedy                80    0.130   0.098  0.833  0.140     1.000      1.4    190  1.00x
+dola_nucleus          80    0.052   0.012  0.605  0.322     0.150      2.2    214  0.99x
+temp0.7               80    0.028   0.000  0.085  0.805     0.022     10.1    192  0.97x <-0
+dola                  80    0.023   0.000  0.346  0.550     1.000      3.5    208  0.98x <-0
+greedy_reppen         80    0.022   0.000  0.000  1.000     1.000     30.6    162  0.74x <-0
+temp1.3               80    0.021   0.000  0.000  0.999     0.002   6490.6    169  0.95x <-0
+sc_k5 (selected)      80    0.021   0.000  0.004  0.961     0.010     42.4    191  4.57x <-0
+sc_k5 (one sample)    80    0.020   0.000  0.006  0.960       nan     45.2    183  0.91x <-0
+nucleus0.9            80    0.015   0.000  0.008  0.959     0.010     42.4    183  0.92x <-0
+
+  paired bootstrap vs nucleus0.9, over 80 prompts (* = 95% CI excludes zero)
+  arm                              d support                d rep4               d dist2
+  beam4                +0.197 [+0.117,+0.288]* +0.819 [+0.795,+0.843]* -0.810 [-0.831,-0.788]*
+  greedy               +0.115 [+0.054,+0.189]* +0.824 [+0.800,+0.848]* -0.819 [-0.840,-0.799]*
+  dola_nucleus         +0.037 [+0.018,+0.056]* +0.596 [+0.566,+0.629]* -0.636 [-0.663,-0.610]*
+  temp0.7              +0.013 [+0.003,+0.025]* +0.076 [+0.056,+0.097]* -0.154 [-0.175,-0.133]*
+  dola                 +0.007 [-0.006,+0.024]  +0.338 [+0.283,+0.394]* -0.409 [-0.460,-0.357]*
+  greedy_reppen        +0.007 [-0.006,+0.022]  -0.008 [-0.017,-0.003]* +0.041 [+0.034,+0.050]*
+  temp1.3              +0.005 [-0.007,+0.022]  -0.008 [-0.016,-0.003]* +0.041 [+0.034,+0.049]*
+  sc_k5 (selected)     +0.005 [-0.002,+0.013]  -0.004 [-0.012,+0.001]  +0.003 [-0.005,+0.011] 
+  sc_k5 (one sample)   +0.004 [-0.001,+0.010]  -0.002 [-0.011,+0.003]  +0.002 [-0.006,+0.011] 
+
+=== llama-1b ==============================================================
+arm                    n  support   calib   rep4  dist2  selfBLEU      ppl  words   cost
+beam4                 80    0.292   0.276  0.548  0.373     1.000      1.9    153  3.58x
+dola_nucleus          80    0.163   0.134  0.154  0.726     0.045      5.7    160  0.88x
+temp0.7               80    0.129   0.097  0.121  0.772     0.035      7.0    163  0.89x
+sc_k5 (selected)      80    0.105   0.071  0.023  0.919     0.026     18.1    173  4.33x
+greedy                80    0.087   0.050  0.645  0.298     1.000      2.2    197  1.00x
+nucleus0.9            80    0.087   0.050  0.020  0.925     0.014     23.3    152  0.84x
+sc_k5 (one sample)    80    0.077   0.039  0.024  0.920       nan     24.7    158  0.87x
+dola                  80    0.060   0.020  0.014  0.938     1.000      6.1    138  0.78x
+greedy_reppen         80    0.037   0.000  0.000  0.994     1.000     12.6    143  0.77x <-0
+temp1.3               80    0.033   0.000  0.000  1.000     0.002  13435.8    140  1.06x <-0
+
+  paired bootstrap vs nucleus0.9, over 80 prompts (* = 95% CI excludes zero)
+  arm                              d support                d rep4               d dist2
+  beam4                +0.205 [+0.129,+0.283]* +0.527 [+0.473,+0.582]* -0.552 [-0.596,-0.510]*
+  dola_nucleus         +0.076 [+0.041,+0.115]* +0.134 [+0.103,+0.165]* -0.199 [-0.231,-0.168]*
+  temp0.7              +0.042 [+0.014,+0.071]* +0.101 [+0.079,+0.125]* -0.153 [-0.176,-0.127]*
+  sc_k5 (selected)     +0.019 [-0.001,+0.038]  +0.003 [-0.010,+0.017]  -0.006 [-0.020,+0.008] 
+  greedy               +0.000 [-0.046,+0.058]  +0.625 [+0.565,+0.687]* -0.627 [-0.682,-0.568]*
+  sc_k5 (one sample)   -0.010 [-0.025,+0.005]  +0.004 [-0.006,+0.013]  -0.005 [-0.015,+0.006] 
+  dola                 -0.027 [-0.052,-0.001]* -0.007 [-0.017,+0.004]  +0.014 [-0.006,+0.032] 
+  greedy_reppen        -0.050 [-0.074,-0.025]* -0.020 [-0.028,-0.013]* +0.069 [+0.060,+0.080]*
+  temp1.3              -0.054 [-0.077,-0.029]* -0.020 [-0.029,-0.013]* +0.075 [+0.066,+0.085]*
+
+=== llama-3b ==============================================================
+arm                    n  support   calib   rep4  dist2  selfBLEU      ppl  words   cost
+beam4                 80    0.267   0.249  0.350  0.569     1.000      2.9    138  3.53x
+dola_nucleus          80    0.161   0.132  0.122  0.773     0.054      6.9    155  0.93x
+dola                  80    0.147   0.117  0.014  0.948     1.000      6.7    132  0.84x
+temp0.7               80    0.137   0.105  0.069  0.832     0.039    110.8    156  0.93x
+sc_k5 (selected)      80    0.119   0.085  0.024  0.914     0.029     17.8    168  4.55x
+greedy                80    0.101   0.066  0.399  0.513     1.000      3.0    172  1.00x
+sc_k5 (one sample)    80    0.089   0.053  0.022  0.925       nan     25.5    151  0.91x
+nucleus0.9            80    0.082   0.045  0.030  0.915     0.015     22.1    156  0.95x
+greedy_reppen         80    0.068   0.030  0.001  0.988     1.000     13.2    128  0.77x
+temp1.3               80    0.027   0.000  0.000  0.999     0.002  13628.4    147  1.13x <-0
+
+  paired bootstrap vs nucleus0.9, over 80 prompts (* = 95% CI excludes zero)
+  arm                              d support                d rep4               d dist2
+  beam4                +0.185 [+0.122,+0.252]* +0.321 [+0.254,+0.388]* -0.346 [-0.408,-0.280]*
+  dola_nucleus         +0.079 [+0.046,+0.114]* +0.092 [+0.065,+0.121]* -0.142 [-0.172,-0.113]*
+  dola                 +0.065 [+0.032,+0.100]* -0.015 [-0.031,+0.000]  +0.033 [+0.015,+0.052]*
+  temp0.7              +0.055 [+0.025,+0.085]* +0.040 [+0.018,+0.063]* -0.083 [-0.108,-0.059]*
+  sc_k5 (selected)     +0.037 [+0.012,+0.060]* -0.006 [-0.021,+0.009]  -0.001 [-0.016,+0.015] 
+  greedy               +0.019 [-0.021,+0.062]  +0.370 [+0.301,+0.443]* -0.402 [-0.465,-0.337]*
+  sc_k5 (one sample)   +0.008 [-0.012,+0.024]  -0.008 [-0.020,+0.004]  +0.010 [-0.003,+0.024] 
+  greedy_reppen        -0.014 [-0.040,+0.016]  -0.028 [-0.041,-0.018]* +0.073 [+0.059,+0.087]*
+  temp1.3              -0.055 [-0.076,-0.035]* -0.029 [-0.041,-0.019]* +0.084 [+0.072,+0.098]*
+

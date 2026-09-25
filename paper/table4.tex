@@ -1,0 +1,23 @@
+\begin{table}[t]
+  \centering
+  \small
+  \begin{tabular}{l rrr}
+    \toprule
+    & \multicolumn{3}{c}{$\Delta$ support rate vs.\ nucleus-0.9} \\
+    \cmidrule(lr){2-4}
+    \textbf{Configuration} & \textbf{GPT-2} & \textbf{Llama-1B} & \textbf{Llama-3B} \\
+    \midrule
+    beam-4 & $+0.197^{*}$ & $+0.205^{*}$ & $+0.185^{*}$ \\
+    greedy & $+0.115^{*}$ & $+0.000$ & $+0.019$ \\
+    greedy+rp & $+0.007$ & $-0.050^{*}$ & $-0.014$ \\
+    T=0.7 & $+0.013^{*}$ & $+0.042^{*}$ & $+0.055^{*}$ \\
+    T=1.3 & $+0.005$ & $-0.054^{*}$ & $-0.055^{*}$ \\
+    DoLa & $+0.007$ & $-0.027^{*}$ & $+0.065^{*}$ \\
+    DoLa+nuc & $+0.037^{*}$ & $+0.076^{*}$ & $+0.079^{*}$ \\
+    SC k=5 & $+0.005$ & $+0.019$ & $+0.037^{*}$ \\
+    SC, one sample & $+0.004$ & $-0.010$ & $+0.008$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Paired bootstrap over the 80 test prompts, 10{,}000 resamples, seeds averaged within a prompt. $^{*}$ marks a 95\% confidence interval excluding zero. DoLa reverses sign with scale (significantly worse than nucleus at 1B, significantly better at 3B); self-consistency reaches significance only at 3B, where DoLa+nucleus delivers twice the gain at a fifth of the compute.}
+  \label{tab:paired}
+\end{table}
