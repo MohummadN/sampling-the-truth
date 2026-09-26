@@ -140,7 +140,7 @@ def main():
         "savefig.bbox": "tight",
     })
 
-    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.6), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.2), sharex=True, sharey=True)
 
     xs = [div[k] for k in div if k[1] in FAMILY and div[k] is not None]
     ys = [sup[k] for k in sup if k[1] in FAMILY and sup[k] is not None]
