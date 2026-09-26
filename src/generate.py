@@ -297,7 +297,7 @@ def generate_one(tok, model, arm: str, entity: dict, seed: int) -> dict:
         "prompt": entity["prompt"],
         "text": text,
         "samples": samples,
-        "selected_index": None,         # sc_k5 only; Fooad's selector fills it
+        "selected_index": None,         # sc_k5 only; filled by scripts/select_sc.py
         "gen_tokens": returned,         # tokens actually returned
         "compute_tokens": compute,      # tokens actually decoded (cost axis)
         "gen_time_s": round(dt, 4),
