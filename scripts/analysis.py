@@ -34,7 +34,7 @@ from src.metrics.diversity import self_bleu
 SPLIT = os.environ.get("SPLIT", "test")
 KEEP = reported_entities()
 REF = "nucleus0.9"
-B = 2000
+B = 10000        # the count §3.6 and Table 3's caption both state
 MODELS = ("gpt2", "llama-1b", "llama-3b")
 
 
@@ -149,7 +149,12 @@ def paired_ci(a: list[float], b: list[float], rng, lower_is_better=False):
         for _ in range(B))
     lo, hi = diffs[int(.025 * B)], diffs[int(.975 * B)]
     d = st.mean(a) - st.mean(b)
-    sig = "*" if (lo > 0 or hi < 0) else " "
+    # Judged at the precision reported. A bound that prints as 0.000 is
+    # not distinguishable from zero at three decimals, and such cells
+    # flipped between 2,000 and 10,000 resamples - that is Monte-Carlo
+    # noise, not an effect, and starring it would contradict the
+    # interval printed beside it.
+    sig = "*" if (round(lo, 3) > 0 or round(hi, 3) < 0) else " "
     return d, lo, hi, sig
 
 

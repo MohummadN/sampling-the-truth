@@ -46,9 +46,11 @@ for arm in order:
 L += [r"    \bottomrule", r"  \end{tabular}",
       r"  \caption{Paired bootstrap over the 80 test prompts, 10{,}000"
       r" resamples, seeds averaged within a prompt. $^{*}$ marks a 95\%"
-      r" confidence interval excluding zero. DoLa reverses sign with scale"
-      r" (significantly worse than nucleus at 1B, significantly better at 3B);"
-      r" self-consistency reaches significance only at 3B, where DoLa+nucleus"
+      r" confidence interval excluding zero at the three decimals reported."
+      r" DoLa's effect reverses sign with scale: negative at 1B, where the"
+      r" interval touches zero, and significantly better at 3B; the two"
+      r" intervals are disjoint. Self-consistency reaches significance only"
+      r" at 3B, where DoLa+nucleus"
       r" delivers twice the gain at a fifth of the compute.}",
       r"  \label{tab:paired}", r"\end{table}", ""]
 
