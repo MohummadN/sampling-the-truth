@@ -18,16 +18,15 @@ comparison stays paired.
 """
 import argparse
 import collections
-import glob
-import json
 import os
 import random
 
-from src.data import reported_entities
+from src.data import load_entities, reported_entities
+from scripts.f1_teaser import load_support_per_entity
 
 from src.metrics.calibration import correct, load_labels, rates
 
-B = 2000
+B = 10000        # the count §3.6 states; analysis.py uses the same
 THETA = 0.5
 # Reported numbers are the 80 test entities (DECISIONS 2026-09-07). The
 # labels themselves come from dev, so TPR/FPR are estimated on one split and
@@ -39,48 +38,41 @@ MODELS = ("gpt2", "llama-1b", "llama-3b")
 
 
 def load_observed():
-    acc = collections.defaultdict(lambda: collections.defaultdict(list))
-    strat = {}
-    for p in glob.glob("outputs/verdicts_*.jsonl"):
-        for line in open(p):
-            r = json.loads(line)
-            if r["entity"] not in KEEP:
-                continue
-            v = r["support_rate"]
-            acc[(r["model"], r["decoding"])][r["entity"]].append(
-                0.0 if v is None else v)
-            strat[r["entity"]] = str(r["stratum"])
+    """Per-entity support per arm, plus each reported entity's stratum.
+
+    Support comes from scripts.f1_teaser so the calibrated table covers the
+    same nine arms the figures and Table 2 do. Globbing verdicts_*.jsonl here
+    quietly dropped sc_k5, whose medoid verdicts are in scverdicts_*.jsonl and
+    need the scchoice_*.jsonl join.
+
+    Strata come from the frozen entity list rather than from whichever records
+    happened to load, so the bootstrap's prompt vector is the reported split
+    itself even if an arm is missing an entity.
+    """
+    acc = load_support_per_entity()
+    strat = {e["entity"]: str(e["stratum"]) for e in load_entities()
+             if e["entity"] in KEEP}
     return acc, strat
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--arm", default="beam4", help="arm for the stratum table")
-    args = ap.parse_args()
+def calibrated_intervals():
+    """{(model, arm): (raw, calibrated, lo, hi)}.
 
+    Table 2 imports this instead of correcting a point estimate of its own, so
+    the dagger in the table and the count in the text apply one test to one set
+    of numbers.
+    """
     labels = load_labels()
     acc, strat = load_observed()
     ents = sorted(strat)
-    idx_of = {e: i for i, e in enumerate(ents)}
-
+    n = len(ents)
     tpr, fpr = rates(labels)
-    print(f"reporting split: {SPLIT} ({len(KEEP)} entities); labels are from dev")
-    print(f"verifier at theta={THETA}: TPR {tpr:.3f}  FPR {fpr:.3f}  "
-          f"(n={len(labels)} labels)")
-    print(f"calibration: T = (R - {fpr:.3f}) / ({tpr:.3f} - {fpr:.3f})"
-          f"  ->  T ~ {1/(tpr-fpr):.2f} R - {fpr/(tpr-fpr):.3f}")
-    print(f"false-positive floor: any arm at or below R = {fpr:.3f} is "
-          f"indistinguishable from zero true support\n")
 
-    # per-arm vectors aligned to `ents`
-    vec = {}
-    for k, per_ent in acc.items():
-        vec[k] = [sum(per_ent[e]) / len(per_ent[e]) if per_ent.get(e) else 0.0
-                  for e in ents]
+    vec = {k: [sum(pe[e]) / len(pe[e]) if pe.get(e) else 0.0 for e in ents]
+           for k, pe in acc.items()}
 
     rng = random.Random(0)
     boots = collections.defaultdict(list)
-    n = len(ents)
     for _ in range(B):
         ls = rng.choices(labels, k=len(labels))
         t_b, f_b = rates(ls)
@@ -91,24 +83,53 @@ def main():
             if c is not None:
                 boots[k].append(c)
 
+    out = {}
+    for k, v in vec.items():
+        R = sum(v) / n
+        bs = sorted(boots[k])
+        lo, hi = bs[int(.025 * len(bs))], bs[int(.975 * len(bs))]
+        out[k] = (R, correct(R, tpr, fpr), lo, hi)
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--arm", default="beam4", help="arm for the stratum table")
+    args = ap.parse_args()
+
+    labels = load_labels()
+    acc, strat = load_observed()
+    ents = sorted(strat)
+
+    tpr, fpr = rates(labels)
+    print(f"reporting split: {SPLIT} ({len(KEEP)} entities); labels are from dev")
+    print(f"verifier at theta={THETA}: TPR {tpr:.3f}  FPR {fpr:.3f}  "
+          f"(n={len(labels)} labels)")
+    print(f"calibration: T = (R - {fpr:.3f}) / ({tpr:.3f} - {fpr:.3f})"
+          f"  ->  T ~ {1/(tpr-fpr):.2f} R - {fpr/(tpr-fpr):.3f}")
+    print(f"false-positive floor: any arm at or below R = {fpr:.3f} is "
+          f"indistinguishable from zero true support\n")
+
+    ci = calibrated_intervals()
+
+    n_floor = 0
     for model in MODELS:
-        rows = []
-        for (m, arm), v in vec.items():
-            if m != model:
-                continue
-            R = sum(v) / n
-            T = correct(R, tpr, fpr)
-            bs = sorted(boots[(m, arm)])
-            lo, hi = bs[int(.025 * len(bs))], bs[int(.975 * len(bs))]
-            rows.append((arm, R, T, lo, hi))
+        rows = [(arm, R, T, lo, hi)
+                for (m, arm), (R, T, lo, hi) in ci.items() if m == model]
         rows.sort(key=lambda r: -r[1])
         print(f"\n{model}")
         print(f"  {'arm':14s} {'raw':>7s} {'calibrated':>11s} {'95% CI':>18s}")
         print("  " + "-" * 54)
+        n_model = 0
         for arm, R, T, lo, hi in rows:
-            flag = "   <- at the FP floor" if lo <= 0.0005 else ""
+            zero = lo <= 0.0005          # the interval includes zero
+            n_model += zero
+            flag = "   <- includes zero" if zero else ""
             print(f"  {arm:14s} {R:7.3f} {T:11.3f} "
                   f"[{lo:.3f}, {hi:.3f}]{flag}")
+        print(f"  {n_model} of {len(rows)} arms indistinguishable from zero")
+        n_floor += n_model
+    print(f"\ntotal arms whose calibrated interval includes zero: {n_floor}")
 
     print(f"\n\nper-stratum calibration, arm = {args.arm}")
     print(f"  {'model':10s} {'str':>3s} {'TPR':>6s} {'FPR':>6s} "

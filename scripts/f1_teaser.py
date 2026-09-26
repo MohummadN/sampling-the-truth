@@ -46,7 +46,13 @@ def macro(per_entity):
     return st.mean(st.mean(v) for v in per_entity.values()) if per_entity else None
 
 
-def load_support():
+def load_support_per_entity():
+    """Per-entity support values, before any averaging.
+
+    The figures want the macro mean; calibrate.py wants the per-prompt vectors
+    to bootstrap over. Both come from here, so an arm can no longer be present
+    in one and silently absent from the other - sc_k5 was.
+    """
     acc = collections.defaultdict(lambda: collections.defaultdict(list))
     for p in glob.glob("outputs/verdicts_*.jsonl"):
         for line in open(p):
@@ -74,7 +80,11 @@ def load_support():
             v = r["support_rate"]
             acc[(r["model"], "sc_k5")][r["entity"]].append(
                 0.0 if v is None else v)
-    return {k: macro(v) for k, v in acc.items()}
+    return acc
+
+
+def load_support():
+    return {k: macro(v) for k, v in load_support_per_entity().items()}
 
 
 def load_diversity():
