@@ -11,8 +11,8 @@ import statistics as st
 
 from src.data import load_entities, reported_entities
 from scripts.f1_teaser import (FAMILY, LABEL, MODELS, TITLES,
-                               load_compute, load_diversity, load_support)
-from scripts.calibrate import correct, load_labels, rates
+                               load_compute, load_diversity)
+from scripts.calibrate import B, calibrated_intervals, load_labels, rates
 
 KEEP = reported_entities()
 OUT = "paper/tables.tex"
@@ -73,26 +73,36 @@ def table1():
 
 
 def table2():
-    sup, div, comp = load_support(), load_diversity(), load_compute()
+    div, comp = load_diversity(), load_compute()
     rep = load_repetition()
     tpr, fpr = rates(load_labels())
+    # Raw and calibrated both come from calibrate.py, which also returns the
+    # interval. The dagger is the same test §3.5 promises and §5 counts -
+    # whether the interval includes zero - rather than a point test of its own,
+    # which daggered five arms where the text counts six.
+    ci = calibrated_intervals()
+    sup = {k: v[0] for k, v in ci.items()}
 
     L = [r"\begin{table*}[t]", r"  \centering", r"  \small",
-         r"  \begin{tabular}{ll rrrr r}", r"    \toprule",
+         r"  \begin{tabular}{ll rrc rr r}", r"    \toprule",
          r"    \textbf{Model} & \textbf{Configuration} & \textbf{Support} "
-         r"& \textbf{Calibrated} & \textbf{Distinct-2} & \textbf{Rep-4} "
-         r"& \textbf{Compute} \\", r"    \midrule"]
+         r"& \textbf{Calibrated} & \textbf{95\% CI} & \textbf{Distinct-2} "
+         r"& \textbf{Rep-4} & \textbf{Compute} \\", r"    \midrule"]
     for model in MODELS:
         first = True
         arms = sorted((a for a in FAMILY if (model, a) in sup),
                       key=lambda a: -sup[(model, a)])
         for a in arms:
-            cal = correct(sup[(model, a)], tpr, fpr)
-            cal_s = "0.000$^{\\dagger}$" if cal is not None and cal <= 0.0005 \
-                else (f"{cal:.3f}" if cal is not None else "--")
+            R, cal, lo, hi = ci[(model, a)]
+            if cal is None:
+                cal_s, ci_s = "--", "--"
+            else:
+                dag = "$^{\\dagger}$" if lo <= 0.0005 else ""
+                cal_s = f"{cal:.3f}{dag}"
+                ci_s = f"[{lo:.3f}, {hi:.3f}]"
             name = TITLES[model] if first else ""
             first = False
-            L.append(f"    {name} & {LABEL[a]} & {sup[(model, a)]:.3f} & {cal_s} "
+            L.append(f"    {name} & {LABEL[a]} & {R:.3f} & {cal_s} & {ci_s} "
                      f"& {div.get((model, a), float('nan')):.3f} "
                      f"& {rep.get((model, a), float('nan')):.3f} "
                      f"& {comp.get((model, a), float('nan')):.2f}$\\times$ \\\\")
@@ -102,11 +112,13 @@ def table2():
           r"  \caption{Main results on the test split, ordered by support rate."
           r" \textbf{Calibrated} applies the Rogan--Gladen correction using the"
           f" verifier's measured sensitivity ({tpr:.3f}) and false-positive rate"
-          f" ({fpr:.3f}) from 100 human labels; $\\dagger$ marks arms at or below"
-          r" the false-positive floor, indistinguishable from zero true support."
-          r" Diversity and repetition are computed over the first 128 tokens to"
-          r" remove the length confound. Compute is generated tokens $\times$"
-          r" beams ($\times$ samples), relative to greedy.}",
+          f" ({fpr:.3f}) from 100 human labels, and the interval resamples the"
+          f" 100 labels and the {len(KEEP)} prompts jointly ({B:,} resamples)."
+          r" $\dagger$ marks arms whose calibrated interval includes"
+          r" zero: indistinguishable from zero true support, whatever the point"
+          r" estimate. Diversity and repetition are computed over the first 128"
+          r" tokens to remove the length confound. Compute is generated tokens"
+          r" $\times$ beams ($\times$ samples), relative to greedy.}",
           r"  \label{tab:main}", r"\end{table*}", ""]
     return "\n".join(L)
 
