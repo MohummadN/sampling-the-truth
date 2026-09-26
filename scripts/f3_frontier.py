@@ -49,7 +49,7 @@ def main():
         "savefig.bbox": "tight",
     })
 
-    fig, axes = plt.subplots(1, 3, figsize=(7.0, 2.2), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(7.0, 1.8), sharex=True, sharey=True)
 
     ys = [sup[k] for k in sup if k[1] in FAMILY and sup[k] is not None]
     ypad = (max(ys) - min(ys)) * 0.14
