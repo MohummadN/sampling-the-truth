@@ -29,6 +29,9 @@ adj = collections.defaultdict(list)
 gen_n = collections.Counter()
 gen_d = collections.Counter()
 missing = collections.Counter()
+# Supported sentences before the claim filter: the denominator the headline
+# support rate uses, against gen_d's claim-only one the calibration uses.
+sup_all = collections.Counter()
 
 for p in glob.glob("outputs/verdicts_*.jsonl"):
     for line in open(p):
@@ -43,6 +46,8 @@ for p in glob.glob("outputs/verdicts_*.jsonl"):
             continue
         n_sup = n_adj = n_claims = 0
         for i, s in enumerate(sents):
+            if s.get("supported"):
+                sup_all[k] += 1
             # Skip inside the loop, never filter the list: i IS the sent_index
             # the control recorded, so re-indexing would break the join and
             # report every row as missing.
@@ -72,14 +77,15 @@ if cov < 0.99:
     raise SystemExit("INCOMPLETE — wait for the mismatch array to finish")
 
 print(f"{'model':10s} {'arm':14s} {'n':>4s} {'raw':>7s} {'adjusted':>9s} "
-      f"{'drop':>7s} {'generic %':>10s}")
-print("-" * 66)
+      f"{'drop':>7s} {'generic %':>10s} {'non-claim %':>12s}")
+print("-" * 79)
 for model in ("gpt2", "llama-1b", "llama-3b"):
     rows = [(a, v) for (m, a), v in raw.items() if m == model]
     for arm, v in sorted(rows, key=lambda r: -st.mean(r[1])):
         k = (model, arm)
         a_mean = st.mean(adj[k])
         g = gen_n[k] / gen_d[k] if gen_d[k] else 0.0
+        nc = 1 - gen_d[k] / sup_all[k] if sup_all[k] else 0.0
         print(f"{model:10s} {arm:14s} {len(v):4d} {st.mean(v):7.3f} {a_mean:9.3f} "
-              f"{a_mean - st.mean(v):+7.3f} {g * 100:9.1f}%")
+              f"{a_mean - st.mean(v):+7.3f} {g * 100:9.1f}% {nc * 100:11.1f}%")
     print()

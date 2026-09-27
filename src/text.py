@@ -27,8 +27,9 @@ def is_claim(sentence: str, entity: str) -> bool:
 
     The verifier scores every segment split_sentences returns, and three kinds
     of segment are not claims at all. Counting them inflates support rate, and
-    unequally: 41% of GPT-2 beam4's supported sentences are non-claims against
-    2% of Llama-3b's, so cross-model comparison inherits the bias.
+    unequally: non-claims are 14.0% of GPT-2 beam4's supported sentences
+    against 6.2% of Llama-3b's, and reach 88.9% on an arm at the floor, so
+    cross-model comparison inherits the bias.
 
       - the Wikipedia title echoed back ("Douglas Wood (engineer).") — a
         tautology once the entity prefix is prepended, so it is entailed by
@@ -37,7 +38,9 @@ def is_claim(sentence: str, entity: str) -> bool:
       - fragments the 256-token cap cut mid-sentence ("Jose Cardozo is"),
         identified by having no terminal punctuation
 
-    Applied identically to every arm, and to both numerator and denominator.
+    Applied identically to every arm by the labelling frame, the genericity
+    control and the dedup probe. NOT applied by score_generation: the reported
+    support rate counts every segment, which the paper discloses in Section 3.3.
     """
     s = (sentence or "").strip()
     if not s:
