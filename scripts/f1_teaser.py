@@ -12,6 +12,7 @@ the first column of the main results table. Degenerate outputs score 0.0.
 import collections
 import glob
 import json
+import os
 import statistics as st
 
 import matplotlib
@@ -184,6 +185,7 @@ def main():
     fig.text(0.5, -0.14, k1, ha="center", fontsize=6, color=MUTED)
     fig.text(0.5, -0.21, k2, ha="center", fontsize=6, color=MUTED)
 
+    os.makedirs("paper/figures", exist_ok=True)
     fig.savefig("paper/figures/f1_teaser.pdf")
     print("wrote paper/figures/f1_teaser.pdf")
     for model in MODELS:

@@ -1,5 +1,5 @@
 outputs/
-figures/
+/figures/
 logs/
 __pycache__/
 *.pyc

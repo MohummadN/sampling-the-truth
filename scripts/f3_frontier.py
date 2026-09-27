@@ -12,6 +12,8 @@ compute is the axis, so encoding it twice would be redundant.
 The dashed staircase is the Pareto frontier: arms that no other arm beats on
 both axes at once.
 """
+import os
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -96,6 +98,7 @@ def main():
     fig.text(0.5, -0.14, k1, ha="center", fontsize=6, color=MUTED)
     fig.text(0.5, -0.21, k2, ha="center", fontsize=6, color=MUTED)
 
+    os.makedirs("paper/figures", exist_ok=True)
     fig.savefig("paper/figures/f3_frontier.pdf")
     print("wrote paper/figures/f3_frontier.pdf\n")
     for model in MODELS:
