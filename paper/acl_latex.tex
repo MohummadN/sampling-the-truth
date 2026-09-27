@@ -301,7 +301,9 @@ We therefore record
 \[
 \text{compute} = \text{generated tokens} \times \text{beams} \times \text{samples}
 \]
-on every record and report every result against it. Wall-clock timing is
+on every record and report every result against it. It counts decoded tokens
+rather than arithmetic, so a method that does extra work per step, such as
+DoLa's layer contrast, is not charged for it. Wall-clock timing is
 CUDA-synchronised.
 
 \subsection{Statistical protocol}
@@ -526,8 +528,8 @@ diversity collapse must be accepted rather than mitigated --- the
 repetition-penalty control shows that removing the repetition also removes most
 of the factuality. Where compute is constrained, DoLa under nucleus sampling is
 the best option at both Llama scales, delivering the largest significant gain
-over nucleus of any configuration at less than greedy's cost. Self-consistency
-is not worth its price at any scale we measured.
+over nucleus of any configuration at no more than greedy's token cost.
+Self-consistency is not worth its price at any scale we measured.
 
 \paragraph{Why self-consistency fails here, stated as a claim others can use.}
 Majority voting works when the output space has a mode that coincides with the
