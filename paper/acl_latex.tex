@@ -353,10 +353,13 @@ after the models were trained.
 \textbf{Dev/test discipline.} The 100 entities are split 20 dev / 80 test, fixed
 in advance. Every tunable quantity --- the entailment threshold $\theta$,
 DoLa's layer selection, the minimum sentence length, and the retrieval-depth
-sensitivity sweep --- was chosen on the 20 dev entities. \textbf{Every number
-reported in this paper is computed on the 80 test entities only.} $\theta$ was
-chosen to maximise agreement with human labels, never to maximise the gap
-between configurations.
+sensitivity sweep --- was chosen on the 20 dev entities, and \textbf{every
+comparison between decoding configurations is computed on the 80 test entities
+only.} What dev measures is the instrument rather than the arms: the 100 human
+labels behind Table~\ref{tab:verifier}, which also set the calibration
+constants, and the sweep in Appendix~\ref{app:robustness}. $\theta$ was chosen
+to maximise agreement with human labels, never to maximise the gap between
+configurations.
 
 \subsection{Generation}
 
@@ -525,14 +528,14 @@ over nucleus of any configuration at less than greedy's cost. Self-consistency
 is not worth its price at any scale we measured.
 
 \paragraph{Why self-consistency fails here, stated as a claim others can use.}
-Its failure is not a tuning problem. Majority voting works when the output
-space has a mode that coincides with the correct answer; for open-ended
-generation the mode is the model's most typical continuation, which for an
-unfamiliar entity is its most practised fabrication. Agreement among samples
-therefore measures confidence, not correctness, and selecting for agreement
-selects for fluent invention. The decomposition supports this directly: the
-pool contains samples more than twice as good as the one the selector returns,
-so the samples are not the limitation.
+Majority voting works when the output space has a mode that coincides with the
+correct answer; for open-ended generation the mode is the model's most typical
+continuation, which for an unfamiliar entity is often its most practised
+fabrication. Agreement is therefore a weak signal rather than a misleading
+one: the medoid beats the pool mean by $+0.028$ and $+0.029$ on the Llamas,
+but that is only about a fifth of the distance to the oracle. The
+decomposition locates the limit in the selector rather than the samples --- the
+pool contains samples more than twice as good as the one it returns.
 
 \section{Conclusion}
 
