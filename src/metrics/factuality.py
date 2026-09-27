@@ -165,8 +165,10 @@ def score_generation(text: str, entity: str, index: dict, retriever,
     """Support rate for one generation, plus the detail needed for error analysis.
 
     Returns None-valued fields for degenerate generations (fewer than 2
-    sentences), which are excluded from the denominator and counted per arm
-    rather than scored 0 or 1 on a single label.
+    sentences), where a single label would force a score of 0 or 1. The record
+    carries the flag, but every reporting script then scores them 0.0 - the
+    zeroed convention - so the prompt set stays identical across arms and each
+    arm is charged for what it failed to produce.
     """
     sents = split_sentences(text or "")
     if len(sents) < 2:

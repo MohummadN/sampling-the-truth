@@ -108,7 +108,7 @@ def main():
     print(f"calibration: T = (R - {fpr:.3f}) / ({tpr:.3f} - {fpr:.3f})"
           f"  ->  T ~ {1/(tpr-fpr):.2f} R - {fpr/(tpr-fpr):.3f}")
     print(f"false-positive floor: any arm at or below R = {fpr:.3f} is "
-          f"indistinguishable from zero true support\n")
+          f"below the calibration's resolution\n")
 
     ci = calibrated_intervals()
 
