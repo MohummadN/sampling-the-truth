@@ -278,6 +278,10 @@ label would force a score of $0$ or $1$. The verifier flags them and returns no
 rate, but every reported number scores them $0.0$, so the prompt set is
 identical across arms and each arm is charged for what it failed to produce.
 
+Support rate scores every segment the splitter returns, while the verifier's
+error rates and the genericity control are estimated only on checkable claims,
+so metric and calibration rest on slightly different populations.
+
 \subsection{Diversity, repetition and fluency}
 
 \textbf{Distinct-$n$} is the ratio of unique to total $n$-grams (1.0 means no
