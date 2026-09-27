@@ -47,9 +47,11 @@ L += [r"    \bottomrule", r"  \end{tabular}",
       r"  \caption{Paired bootstrap over the 80 test prompts, 10{,}000"
       r" resamples, seeds averaged within a prompt. $^{*}$ marks a 95\%"
       r" confidence interval excluding zero at the three decimals reported."
-      r" DoLa's effect reverses sign with scale: negative at 1B, where the"
-      r" interval touches zero, and significantly better at 3B; the two"
-      r" intervals are disjoint. Self-consistency reaches significance only"
+      r" The controlled DoLa comparison is DoLa+nucleus, which differs from"
+      r" nucleus only in the layer contrast and is significant at all three"
+      r" scales; the plain DoLa row is a greedy-family decoder measured"
+      r" against a sampling baseline, which is why it reverses sign."
+      r" Self-consistency reaches significance only"
       r" at 3B, where DoLa+nucleus"
       r" delivers twice the gain at a fifth of the compute.}",
       r"  \label{tab:paired}", r"\end{table}", ""]

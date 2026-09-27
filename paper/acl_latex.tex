@@ -39,9 +39,11 @@ across three open models spanning 124M to 3B parameters, three seeds and 100
 biography prompts --- 8{,}100 generations --- scoring every sentence against
 the subject's Wikipedia page with an NLI verifier calibrated against 100 blind
 human labels. Beam search is the most factual configuration at every scale and
-costs almost all of the diversity, at $3.5\times$ the compute. DoLa reverses
-sign with scale, negative against nucleus sampling at 1B and
-significantly better at 3B while being cheaper and more diverse.
+costs almost all of the diversity, at $3.5\times$ the compute. Under a matched sampler, DoLa's
+layer contrast improves on nucleus sampling at all three scales, though at
+124M both arms sit at the verifier's floor; its apparent reversal with scale
+is an artifact of comparing a greedy-family decoder against a sampling
+baseline.
 Self-consistency never reaches the Pareto frontier: an oracle that picked the
 best of its five samples would still lose to beam search at comparable cost.
 At 124M, most apparent factuality is genericity rather than knowledge.
@@ -74,9 +76,10 @@ measured false-positive rate.
 
 Three findings stand out. Beam search is the most factual configuration at
 every scale, and pays for it with almost total loss of diversity and
-$3.5\times$ the compute (Figure~\ref{fig:teaser}). DoLa's effect reverses sign
-with model scale: negative against nucleus sampling at 1B,
-significantly better at 3B, where it is also cheaper and more diverse.
+$3.5\times$ the compute (Figure~\ref{fig:teaser}). DoLa's layer contrast, compared
+against nucleus under a matched sampler, improves factual support at all three
+scales ($+0.037$, $+0.076$, $+0.079$) at a cost in diversity; the reversal the
+unmatched comparison shows belongs to the decoder family, not the contrast.
 Self-consistency does not pay for itself --- it lies off the Pareto frontier at
 every scale, and the reason is the selector rather than the samples, since an
 oracle choosing the best of the five would still lose to beam search at
@@ -445,17 +448,16 @@ Table~\ref{tab:main}: greedy and beam search reproduce the known repetition
 failure (rep-4 $0.833$ and $0.827$ on GPT-2), and factual support falls
 monotonically as temperature rises from $0.7$ to $1.3$ at every scale.
 
-\paragraph{DoLa's effect reverses sign with model scale.} Against nucleus
-sampling under an identical sampler, DoLa is negative at 1B
-($-0.027$, 95\% CI $[-0.052, -0.000]$) and significantly \emph{better} at 3B
-($+0.065$, $[+0.033, +0.099]$). The 1B interval touches zero at the precision
-we report, so the reversal rests on the 3B end together with the two intervals
-being disjoint, rather than on both ends being individually significant. At 3B
-the improvement is not bought with diversity either: DoLa is simultaneously
-more diverse than nucleus ($+0.033$ distinct-2) and cheaper ($0.84\times$
-greedy), which makes it a strict improvement on all three axes. The same
-pattern appears in the likelihood-maximising family, where plain DoLa beats
-greedy at 3B (0.147 against 0.101) but loses to it at 1B (0.060 against 0.087).
+\paragraph{DoLa's layer contrast helps once the sampler is matched.}
+DoLa+nucleus and nucleus differ only in the layer contrast, and it is positive
+and significant at every scale: $+0.037$ (95\% CI $[+0.018, +0.056]$),
+$+0.076$ ($[+0.040, +0.114]$) and $+0.079$ ($[+0.044, +0.115]$). At 124M both
+arms calibrate to the verifier's floor (Table~\ref{tab:main}), so that gain is
+in false positives rather than support. It is not free: DoLa+nucleus is less
+diverse than nucleus at every scale ($-0.636$, $-0.199$, $-0.142$ distinct-2).
+The apparent reversal belongs to plain DoLa, a greedy-family decoder with a
+repetition penalty, which flips against its own baseline --- beating greedy at
+3B (0.147 against 0.101) and losing at 1B (0.060 against 0.087).
 
 \paragraph{Self-consistency does not pay for itself at matched compute.} At
 $4.3$--$4.6\times$ greedy's cost it reaches significance against nucleus
@@ -538,8 +540,9 @@ so the samples are not the limitation.
 Holding the model, prompts, seeds and inference budget fixed while varying only
 the decoder shows that the decoding choice is a factuality intervention of the
 same order as a change in model scale, and that its cost is routinely
-understated. Beam search buys factual support with diversity and compute; DoLa
-becomes worthwhile only above some scale between 1B and 3B; and aggregation by
+understated. Beam search buys factual support with diversity and compute;
+DoLa's layer contrast helps wherever the sampler is matched and pays for it in
+diversity; and aggregation by
 self-consistency, extended to open-ended text, is dominated everywhere we
 measured. Both halves of the tradeoff have to be measured at a matched budget
 for any of these statements to be well defined.
