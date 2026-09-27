@@ -114,15 +114,16 @@ tradeoff we study is exactly the one their paper leaves open.
 
 \paragraph{Decoding for factuality.}
 \citet{li2023contrastive} introduced contrastive decoding, which scores
-continuations by the difference between an expert and an amateur model.
-\citet{chuang2024dola} specialised the idea within a single model: DoLa
-contrasts the logits of a late layer against an earlier one, on the argument
-that factual knowledge is resolved in the upper layers. Both report gains on
-multiple-choice and short-form benchmarks. Three things are left open that this
-paper addresses: behaviour on open-ended generation rather than fixed answers,
-behaviour at small scale, and whether the repetition penalty DoLa ships with is
-responsible for part of the reported effect --- which our \textbf{greedy+rp}
-control isolates directly.
+continuations by the difference between an expert and an amateur model, and
+evaluated it on open-ended generation judged for quality rather than factual
+accuracy. \citet{chuang2024dola} specialised the idea within a single model:
+DoLa contrasts the logits of a late layer against an earlier one, on the
+argument that factual knowledge is resolved in the upper layers, and reports
+gains on multiple-choice and short-form benchmarks. Factual accuracy in
+open-ended generation falls between the two. Also left open are behaviour at
+small scale, and whether the repetition penalty DoLa ships with is responsible
+for part of the reported effect --- which our \textbf{greedy+rp} control
+isolates directly.
 
 \paragraph{Aggregation over samples.}
 \citet{wang2023selfconsistency} showed that sampling several chains of thought
