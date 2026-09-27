@@ -272,10 +272,9 @@ deterministic and free but collapses mixed-truth sentences onto one label.
 Support is not truth; it is agreement with one reference page.
 
 Generations with fewer than two usable sentences are \emph{degenerate}: a single
-label would force a score of $0$ or $1$. They are excluded from the support-rate
-denominator and reported as a per-configuration coverage column. Paired tests
-score them $0.0$ so every prompt pair survives; the ordering is identical under
-both conventions.
+label would force a score of $0$ or $1$. The verifier flags them and returns no
+rate, but every reported number scores them $0.0$, so the prompt set is
+identical across arms and each arm is charged for what it failed to produce.
 
 \subsection{Diversity, repetition and fluency}
 
