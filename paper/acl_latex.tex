@@ -44,7 +44,7 @@ layer contrast improves on nucleus sampling at all three scales, though at
 124M both arms sit at the verifier's floor; its apparent reversal with scale
 is an artifact of comparing a greedy-family decoder against a sampling
 baseline.
-Self-consistency never reaches the support--compute frontier: an oracle
+Medoid self-consistency never reaches the support--compute frontier: an oracle
 picking the best of its five samples would still lose to beam search at
 comparable cost.
 At 124M, most apparent factuality is genericity rather than knowledge.
@@ -81,7 +81,7 @@ $3.5\times$ the compute (Figure~\ref{fig:teaser}). DoLa's layer contrast, compar
 against nucleus under a matched sampler, improves factual support at all three
 scales ($+0.037$, $+0.076$, $+0.079$) at a cost in diversity; the reversal the
 unmatched comparison shows belongs to the decoder family, not the contrast.
-Self-consistency does not pay for itself --- it lies off the support--compute
+Medoid self-consistency does not pay for itself --- it lies off the support--compute
 frontier at every scale, and the reason is the selector rather than the
 samples, since an oracle choosing the best of the five would still lose to
 beam search at comparable cost.
@@ -537,7 +537,7 @@ repetition-penalty control shows that removing the repetition also removes most
 of the factuality. Where compute is constrained, DoLa under nucleus sampling is
 the best option at both Llama scales, delivering the largest significant gain
 over nucleus of any configuration at no more than greedy's token cost.
-Self-consistency is not worth its price at any scale we measured.
+Medoid self-consistency is not worth its price at any scale we measured.
 
 \paragraph{Why self-consistency fails here, stated as a claim others can use.}
 Majority voting works when the output space has a mode that coincides with the
