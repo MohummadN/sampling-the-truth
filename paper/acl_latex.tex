@@ -407,8 +407,8 @@ T = \frac{R - \mathrm{FPR}}{\mathrm{TPR} - \mathrm{FPR}},
 \]
 which is prevalence-independent and therefore transfers from the label frame to
 each configuration. A configuration whose calibrated interval includes zero is
-reported as indistinguishable from zero true support rather than as a small
-positive number.
+reported as below the calibration's resolution rather than as a small positive
+number.
 
 Calibrated intervals resample the 100 labels and the 80 test prompts jointly,
 10{,}000 times, so that uncertainty in the verifier's sensitivity and
@@ -450,8 +450,10 @@ untouched. Exact sentence repeats tell the same story: 61.1\% of greedy's
 sentences and 53.2\% of beam-4's are verbatim duplicates of an earlier sentence
 in the same generation, against 0.0\% for greedy+rp. Degeneration is therefore
 a decoding artifact that a one-line change removes --- though removing it also
-removes most of the factuality, since greedy+rp calibrates to zero on GPT-2 and
-Llama-1B. Two sanity checks promised in the proposal are visible in
+removes most of the factuality: greedy clears nucleus at 124M ($+0.115^{*}$)
+where greedy+rp does not ($+0.007$), and at 1B greedy+rp falls significantly
+below nucleus ($-0.050$, $[-0.073, -0.025]$). Two sanity checks promised in
+the proposal are visible in
 Table~\ref{tab:main}: greedy and beam search reproduce the known repetition
 failure (rep-4 $0.833$ and $0.827$ on GPT-2), and factual support falls
 monotonically as temperature rises from $0.7$ to $1.3$ at every scale.
@@ -494,8 +496,8 @@ monotonically with scale: 56.0\%, 9.9\%, 3.6\%. Adjusting for it
 greedy drops only from 0.136 to 0.092, so greedy becomes the more factual GPT-2
 configuration by roughly $1.8\times$ (these raw rates cover claim-like
 sentences only, so they differ slightly from Table~\ref{tab:main}). Both Llamas keep beam-4 first (0.239, 0.248). Under the
-calibrated metric, six of GPT-2's eight single-pass configurations are
-indistinguishable from zero true support, against four at 1B and three at 3B:
+calibrated metric, six of GPT-2's eight single-pass configurations fall below
+the calibration's resolution, against four at 1B and three at 3B:
 at the smallest scale the only comparison the data support is beam-4 against
 greedy.
 
@@ -571,7 +573,9 @@ rather than atomic facts forces an all-or-nothing call on mixed content: 23 of
 absolute numbers are not comparable with published FActScore values. The
 verifier is high-recall and low-precision; we report calibrated rates beside
 raw ones, but the calibration rests on 100 labels and assumes a constant error
-rate across configurations. Top-5 retrieval additionally loses roughly 3\% of
+rate across configurations --- an assumption nine of the 27
+model--configuration cells violate, since a raw rate below the false-positive
+rate of $0.041$ is impossible under it. Top-5 retrieval additionally loses roughly 3\% of
 all sentences the page would support (Appendix~\ref{app:robustness}), and the
 headline numbers are not corrected for it.
 

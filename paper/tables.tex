@@ -54,6 +54,6 @@
      & T=1.3 & 0.027 & 0.000$^{\dagger}$ & [0.000, 0.012] & 0.999 & 0.000 & 1.13$\times$ \\
     \bottomrule
   \end{tabular}
-  \caption{Main results on the test split, ordered by support rate. \textbf{Calibrated} applies the Rogan--Gladen correction using the verifier's measured sensitivity (0.947) and false-positive rate (0.041) from 100 human labels, and the interval resamples the 100 labels and the 80 prompts jointly (10,000 resamples). $\dagger$ marks arms whose calibrated interval includes zero: indistinguishable from zero true support, whatever the point estimate. Diversity and repetition are computed over the first 128 tokens to remove the length confound. Compute is generated tokens $\times$ beams ($\times$ samples), relative to greedy.}
+  \caption{Main results on the test split, ordered by support rate. \textbf{Calibrated} applies the Rogan--Gladen correction using the verifier's measured sensitivity (0.947) and false-positive rate (0.041) from 100 human labels, and the interval resamples the 100 labels and the 80 prompts jointly (10,000 resamples). $\dagger$ marks arms whose calibrated interval includes zero: below the calibration's resolution, whatever the point estimate. Diversity and repetition are computed over the first 128 tokens to remove the length confound. Compute is generated tokens $\times$ beams ($\times$ samples), relative to greedy.}
   \label{tab:main}
 \end{table*}

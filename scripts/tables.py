@@ -115,7 +115,7 @@ def table2():
           f" ({fpr:.3f}) from 100 human labels, and the interval resamples the"
           f" 100 labels and the {len(KEEP)} prompts jointly ({B:,} resamples)."
           r" $\dagger$ marks arms whose calibrated interval includes"
-          r" zero: indistinguishable from zero true support, whatever the point"
+          r" zero: below the calibration's resolution, whatever the point"
           r" estimate. Diversity and repetition are computed over the first 128"
           r" tokens to remove the length confound. Compute is generated tokens"
           r" $\times$ beams ($\times$ samples), relative to greedy.}",
