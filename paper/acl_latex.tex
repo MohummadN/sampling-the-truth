@@ -38,8 +38,8 @@ budget. We evaluate seven decoding configurations and two diagnostic controls
 across three open models spanning 124M to 3B parameters, three seeds and 100
 biography prompts --- 8{,}100 generations --- scoring every sentence against
 the subject's Wikipedia page with an NLI verifier calibrated against 100 blind
-human labels. Beam search is the most factual configuration at every scale and
-costs almost all of the diversity, at $3.5\times$ the compute. Under a matched sampler, DoLa's
+human labels. Beam search is the most factual configuration at both Llama scales
+and costs almost all of the diversity, at $3.5\times$ the compute. Under a matched sampler, DoLa's
 layer contrast improves on nucleus sampling at all three scales, though at
 124M both arms sit at the verifier's floor; its apparent reversal with scale
 is an artifact of comparing a greedy-family decoder against a sampling
@@ -75,8 +75,8 @@ repetition and fluency. The verifier is not trusted on faith --- it is
 validated against 100 blind human labels and its output calibrated by the
 measured false-positive rate.
 
-Three findings stand out. Beam search is the most factual configuration at
-every scale, and pays for it with almost total loss of diversity and
+Three findings stand out. Beam search is the most factual configuration at both
+Llama scales, and pays for it with almost total loss of diversity and
 $3.5\times$ the compute (Figure~\ref{fig:teaser}). DoLa's layer contrast, compared
 against nucleus under a matched sampler, improves factual support at all three
 scales ($+0.037$, $+0.076$, $+0.079$) at a cost in diversity; the reversal the
@@ -429,13 +429,15 @@ this paper is generated from those records by a committed script, available at
 
 \section{Results}
 
-\paragraph{Beam search is the most factual configuration at every scale, and
-pays for it in diversity.} Beam-4 reaches a support rate of 0.213, 0.292 and
+\paragraph{Beam search is the most factual configuration at both Llama scales,
+and pays for it in diversity.} Beam-4 reaches a support rate of 0.213, 0.292 and
 0.267 on GPT-2, Llama-1B and Llama-3B (Table~\ref{tab:main}), significantly
 above nucleus sampling in all three (+0.197, +0.205, +0.185; all 95\%
 intervals exclude zero, Table~\ref{tab:paired}). It is also the only
-configuration whose calibrated interval excludes zero in all three models. The
-cost is visible in Figure~\ref{fig:teaser}: beam-4 sits alone in the
+configuration whose calibrated interval excludes zero in all three models. At
+124M its calibrated interval overlaps greedy's, and the genericity control
+below reverses the ordering. The cost is visible in Figure~\ref{fig:teaser}:
+beam-4 sits alone in the
 high-factuality, low-diversity corner, repeating 82.7\% of its 4-grams on GPT-2
 against nucleus sampling's 0.8\%, and it consumes $3.5\times$ greedy's
 inference compute.
