@@ -44,8 +44,9 @@ layer contrast improves on nucleus sampling at all three scales, though at
 124M both arms sit at the verifier's floor; its apparent reversal with scale
 is an artifact of comparing a greedy-family decoder against a sampling
 baseline.
-Self-consistency never reaches the Pareto frontier: an oracle that picked the
-best of its five samples would still lose to beam search at comparable cost.
+Self-consistency never reaches the support--compute frontier: an oracle
+picking the best of its five samples would still lose to beam search at
+comparable cost.
 At 124M, most apparent factuality is genericity rather than knowledge.
 \end{abstract}
 
@@ -80,10 +81,10 @@ $3.5\times$ the compute (Figure~\ref{fig:teaser}). DoLa's layer contrast, compar
 against nucleus under a matched sampler, improves factual support at all three
 scales ($+0.037$, $+0.076$, $+0.079$) at a cost in diversity; the reversal the
 unmatched comparison shows belongs to the decoder family, not the contrast.
-Self-consistency does not pay for itself --- it lies off the Pareto frontier at
-every scale, and the reason is the selector rather than the samples, since an
-oracle choosing the best of the five would still lose to beam search at
-comparable cost.
+Self-consistency does not pay for itself --- it lies off the support--compute
+frontier at every scale, and the reason is the selector rather than the
+samples, since an oracle choosing the best of the five would still lose to
+beam search at comparable cost.
 
 The question this work asks is therefore: how does the choice of decoding strategy
 --- greedy and beam search, temperature and nucleus sampling, DoLa, and
@@ -464,9 +465,9 @@ repetition penalty, which flips against its own baseline --- beating greedy at
 \paragraph{Self-consistency does not pay for itself at matched compute.} At
 $4.3$--$4.6\times$ greedy's cost it reaches significance against nucleus
 sampling only at 3B ($+0.037$, $[+0.012, +0.060]$), where DoLa+nucleus delivers
-twice that gain ($+0.079$) at $0.93\times$. It lies off the Pareto frontier at
-all three scales (Figure~\ref{fig:frontier}): something is both more factual
-and cheaper in every case.
+twice that gain ($+0.079$) at $0.93\times$. It lies off the support--compute
+frontier at all three scales (Figure~\ref{fig:frontier}): something is both
+more factual and cheaper in every case.
 
 \paragraph{The limitation is the selector, not the pool.} Verifying all five
 samples rather than only the chosen one separates the two. The pool's mean
@@ -545,8 +546,8 @@ same order as a change in model scale, and that its cost is routinely
 understated. Beam search buys factual support with diversity and compute;
 DoLa's layer contrast helps wherever the sampler is matched and pays for it in
 diversity; and aggregation by
-self-consistency, extended to open-ended text, is dominated everywhere we
-measured. Both halves of the tradeoff have to be measured at a matched budget
+self-consistency, extended to open-ended text, is dominated once compute is
+priced in. Both halves of the tradeoff have to be measured at a matched budget
 for any of these statements to be well defined.
 
 \section*{Limitations}
