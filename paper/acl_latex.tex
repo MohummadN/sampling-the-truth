@@ -79,8 +79,9 @@ Three findings stand out. Beam search is the most factual configuration at both
 Llama scales, and pays for it with almost total loss of diversity and
 $3.5\times$ the compute (Figure~\ref{fig:teaser}). DoLa's layer contrast, compared
 against nucleus under a matched sampler, improves factual support at all three
-scales ($+0.037$, $+0.076$, $+0.079$) at a cost in diversity; the reversal the
-unmatched comparison shows belongs to the decoder family, not the contrast.
+scales ($+0.037$, $+0.076$, $+0.079$) at a cost in diversity, though at 124M
+both arms fall below the calibration's resolution; the reversal the unmatched
+comparison shows belongs to the decoder family, not the contrast.
 Medoid self-consistency does not pay for itself --- it lies off the support--compute
 frontier at every scale, and the reason is the selector rather than the
 samples, since an oracle choosing the best of the five would still lose to
