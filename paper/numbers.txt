@@ -114,11 +114,11 @@ reporting split: test (80 entities)
 entities with fewer than 5 scored samples: 0
 entities dropped for a missing selection: 0
 
-model         n    pool      sc  oracle   worst  sc-pool  headroom
-------------------------------------------------------------------
-gpt2        240   0.020   0.021   0.069   0.000   +0.001     0.048
-llama-1b    240   0.077   0.105   0.223   0.005   +0.028     0.118
-llama-3b    240   0.089   0.119   0.248   0.005   +0.029     0.129
+model         n    pool      sc  oracle   worst  sc-pool  headroom   agree
+--------------------------------------------------------------------------
+gpt2        240   0.020   0.021   0.069   0.000   +0.001     0.048   0.206
+llama-1b    240   0.077   0.105   0.223   0.005   +0.028     0.118   0.395
+llama-3b    240   0.089   0.119   0.248   0.005   +0.029     0.129   0.409
 
 ### analyze_mismatch
 reporting split: test (80 entities)

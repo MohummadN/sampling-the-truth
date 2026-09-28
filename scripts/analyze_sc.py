@@ -20,12 +20,18 @@ SPLIT = os.environ.get("SPLIT", "test")
 KEEP = reported_entities()
 
 sel = {}
+# mean_sim is the pool's internal agreement, written per selection by
+# select_sc.py. Aggregating it here is what lets 5 cite it: nothing else
+# reports it, so the paper had been quoting a figure no script produced.
+agree = collections.defaultdict(list)
 for p in glob.glob("outputs/scchoice_*.jsonl"):
     for line in open(p):
         r = json.loads(line)
         if r["entity"] not in KEEP:
             continue
         sel[(r["model"], r["seed"], r["entity"])] = r["selected_index"]
+        if r.get("mean_sim") is not None:
+            agree[r["model"]].append(r["mean_sim"])
 
 rates = collections.defaultdict(dict)
 for p in glob.glob("outputs/scverdicts_*.jsonl"):
@@ -61,12 +67,13 @@ for k, d in rates.items():
 print(f"reporting split: {SPLIT} ({len(KEEP)} entities)")
 print(f"entities with fewer than 5 scored samples: {incomplete}")
 print(f"entities dropped for a missing selection: {no_selection}\n")
-hdr = f"{'model':10s} {'n':>4s} {'pool':>7s} {'sc':>7s} {'oracle':>7s} {'worst':>7s} {'sc-pool':>8s} {'headroom':>9s}"
+hdr = f"{'model':10s} {'n':>4s} {'pool':>7s} {'sc':>7s} {'oracle':>7s} {'worst':>7s} {'sc-pool':>8s} {'headroom':>9s} {'agree':>7s}"
 print(hdr)
 print("-" * len(hdr))
 for m in sorted(out):
     o = out[m]
     pool, sc = st.mean(o["pool"]), st.mean(o["sc"])
     orc, wst = st.mean(o["oracle"]), st.mean(o["worst"])
+    a = st.mean(agree[m]) if agree[m] else float("nan")
     print(f"{m:10s} {len(o['pool']):4d} {pool:7.3f} {sc:7.3f} {orc:7.3f} {wst:7.3f} "
-          f"{sc - pool:+8.3f} {orc - sc:9.3f}")
+          f"{sc - pool:+8.3f} {orc - sc:9.3f} {a:7.3f}")
