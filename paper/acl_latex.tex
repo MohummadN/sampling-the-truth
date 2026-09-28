@@ -294,9 +294,9 @@ measures mutual similarity among several generations from one configuration,
 and is reported only for stochastic configurations, since a deterministic
 decoder returns identical text across seeds and scores 1.0 by construction
 rather than by lack of diversity. \textbf{Fluency} is perplexity under a scorer
-model disjoint from all three generators. Generation length varies by more than
-a factor of two across configurations and distinct-$n$ falls mechanically with
-length, so every length-sensitive metric is computed on a fixed 128-token
+model disjoint from all three generators. Mean generation length ranges from
+165 to 256 tokens across configurations and distinct-$n$ falls mechanically
+with length, so every length-sensitive metric is computed on a fixed 128-token
 prefix.
 
 \subsection{Matched inference compute}
@@ -380,7 +380,7 @@ Three seeds (1234, 5678, 9012), fixed before any result was observed.
 real biography, and identical across arms, on which the fairness of the
 comparison depends. The full grid is 3 models $\times$ 9 configurations
 $\times$ 3 seeds $\times$ 100 prompts $=$ \textbf{8{,}100 generations}. Cap
-rates range from 40\% to 89\% across configurations, which is why every
+rates range from 36\% to 100\% across configurations, which is why every
 length-sensitive metric is also computed on a fixed prefix.
 
 \subsection{Verifier}
