@@ -34,9 +34,12 @@ the first run. Nothing is downloaded at run time.
 stratified by article length, split 20 dev / 80 test, and frozen.
 
 **Dev/test discipline.** Every tunable quantity was chosen on the 20 dev
-entities; every number in the paper is computed on the 80 test entities. The
-split is applied by `src.data.reported_entities()` and can be overridden with
-the `SPLIT` environment variable (`dev`, `test`, `all`) for dev-only sweeps.
+entities; every comparison between decoding configurations is computed on the
+80 test entities. What dev measures is the instrument rather than the arms: the
+100 human labels behind the verifier validation, which also set the calibration
+constants, and the retrieval-depth sweep. The split is applied by
+`src.data.reported_entities()` and can be overridden with the `SPLIT`
+environment variable (`dev`, `test`, `all`) for dev-only sweeps.
 
 ## Pipeline
 
@@ -85,9 +88,10 @@ labelled blind by the authors without the model's verdict visible.
     python -m scripts.compare_topm
     python -m scripts.analyze_dola_sweep
 
-    python -m scripts.tables       # -> paper/tables.tex   (Tables 1, 2)
-    python -m scripts.table3       # -> paper/table3.tex   (paired bootstrap)
-    python -m scripts.table4       # -> paper/table4.tex   (verifier validation)
+    # The script names are offset from the paper's table numbers:
+    python -m scripts.tables       # -> paper/tables.tex   (paper Tables 1, 2)
+    python -m scripts.table3       # -> paper/table3.tex   (paper Table 4, verifier validation)
+    python -m scripts.table4       # -> paper/table4.tex   (paper Table 3, paired bootstrap)
     python -m scripts.f1_teaser    # -> paper/figures/f1_teaser.pdf
     python -m scripts.f3_frontier  # -> paper/figures/f3_frontier.pdf
     python -m scripts.plots
