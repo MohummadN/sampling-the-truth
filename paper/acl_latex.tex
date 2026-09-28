@@ -41,9 +41,9 @@ the subject's Wikipedia page with an NLI verifier calibrated against 100 blind
 human labels. Beam search is the most factual configuration at both Llama scales
 and costs almost all of the diversity, at $3.5\times$ the compute. Under a matched sampler, DoLa's
 layer contrast improves on nucleus sampling at all three scales, though at
-124M both arms sit at the verifier's floor; its apparent reversal with scale
-is an artifact of comparing a greedy-family decoder against a sampling
-baseline.
+124M both arms fall below the calibration's resolution; its apparent reversal
+with scale is an artifact of comparing a greedy-family decoder against a
+sampling baseline.
 Medoid self-consistency never reaches the support--compute frontier: an oracle
 picking the best of its five samples would still lose to beam search at
 comparable cost.
@@ -254,8 +254,8 @@ the oracle best-of-five bound.
 \subsection{Factuality: sentence-level support}
 
 A generation is split into sentences; each sentence becomes a claim to verify
-against the entity's Wikipedia page. We retrieve the five most relevant
-three-sentence windows of the page using a hybrid of BM25
+against the entity's Wikipedia page (Figure~\ref{fig:method}). We retrieve the
+five most relevant three-sentence windows of the page using a hybrid of BM25
 \citep{robertson2009bm25} and dense retrieval \citep{reimers2019sbert,
 song2020mpnet}, and score each window--claim pair with a natural language
 inference (NLI) model, which predicts whether a premise entails, contradicts or
@@ -292,10 +292,11 @@ measures mutual similarity among several generations from one configuration,
 and is reported only for stochastic configurations, since a deterministic
 decoder returns identical text across seeds and scores 1.0 by construction
 rather than by lack of diversity. \textbf{Fluency} is perplexity under a scorer
-model disjoint from all three generators. Mean generation length ranges from
-165 to 256 tokens across configurations and distinct-$n$ falls mechanically
-with length, so every length-sensitive metric is computed on a fixed 128-token
-prefix.
+model disjoint from all three generators. Self-BLEU and perplexity are computed
+for every record by the committed analysis script but are not tabulated here.
+Mean generation length ranges from 165 to 256 tokens across configurations and
+distinct-$n$ falls mechanically with length, so every length-sensitive metric
+is computed on a fixed 128-token prefix.
 
 \subsection{Matched inference compute}
 
@@ -468,19 +469,21 @@ as temperature rises from $0.7$ to $1.3$ at every scale.
 DoLa+nucleus and nucleus differ only in the layer contrast, and it is positive
 and significant at every scale: $+0.037$ (95\% CI $[+0.018, +0.056]$),
 $+0.076$ ($[+0.040, +0.114]$) and $+0.079$ ($[+0.044, +0.115]$). At 124M both
-arms calibrate to the verifier's floor (Table~\ref{tab:main}), so that gain is
-in false positives rather than support. It is not free: DoLa+nucleus is less
-diverse than nucleus at every scale ($-0.636$, $-0.199$, $-0.142$ distinct-2).
-The apparent reversal belongs to plain DoLa, a greedy-family decoder with a
-repetition penalty, which flips against its own baseline --- beating greedy at
-3B (0.147 against 0.101) and losing at 1B (0.060 against 0.087).
+arms fall below the calibration's resolution (Table~\ref{tab:main}), so that
+gain is in false positives rather than support. It is not free: DoLa+nucleus is
+less diverse than nucleus at every scale ($-0.636$, $-0.199$, $-0.142$
+distinct-2). The apparent reversal belongs to plain DoLa, a greedy-family
+decoder with a repetition penalty, which flips against its own baseline ---
+beating greedy at 3B (0.147 against 0.101) and losing at 1B (0.060 against
+0.087).
 
 \paragraph{Medoid self-consistency does not pay for itself at matched compute.} At
 $4.3$--$4.6\times$ greedy's cost it reaches significance against nucleus
 sampling only at 3B ($+0.037$, $[+0.012, +0.060]$), where DoLa+nucleus delivers
 twice that gain ($+0.079$) at $0.93\times$. It lies off the support--compute
-frontier at all three scales (Figure~\ref{fig:frontier}): something is both
-more factual and cheaper in every case.
+frontier at all three scales (Table~\ref{tab:main};
+Figure~\ref{fig:frontier}): something is both more factual and cheaper in every
+case.
 
 \paragraph{The limitation is the selector, not the pool.} Verifying all five
 samples rather than only the chosen one separates the two. The pool's mean
@@ -528,10 +531,11 @@ diversity collapse must be accepted rather than mitigated --- the
 repetition-penalty control shows that removing the repetition also removes most
 of the factuality. Where compute is constrained, DoLa under nucleus sampling is
 the best option at both Llama scales, delivering the largest significant gain
-over nucleus of any configuration costing no more than greedy in tokens.
+over nucleus of any configuration costing no more than greedy in tokens, though
+it too gives up diversity to get there.
 Medoid self-consistency is not worth its price at any scale we measured.
 
-\paragraph{Why medoid self-consistency fails here, stated as a claim others can use.}
+\paragraph{Why medoid self-consistency fails here.}
 Majority voting works when the output space has a mode that coincides with the
 correct answer; for open-ended generation the mode is the model's most typical
 continuation, which for an unfamiliar entity is often its most practised
