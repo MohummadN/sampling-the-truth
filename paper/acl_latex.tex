@@ -525,8 +525,8 @@ numbers.
   \centering
   \includegraphics[width=\linewidth]{figures/f3_frontier.pdf}
   \caption{Support rate against inference compute relative to greedy, log
-    scale. The dashed staircase marks the Pareto frontier. Self-consistency
-    lies off the frontier at every scale.}
+    scale. The dashed staircase marks the Pareto frontier. Medoid
+    self-consistency lies off the frontier at every scale.}
   \label{fig:frontier}
 \end{figure*}
 
@@ -541,7 +541,7 @@ diversity collapse must be accepted rather than mitigated --- the
 repetition-penalty control shows that removing the repetition also removes most
 of the factuality. Where compute is constrained, DoLa under nucleus sampling is
 the best option at both Llama scales, delivering the largest significant gain
-over nucleus of any configuration at no more than greedy's token cost.
+over nucleus of any configuration costing no more than greedy in tokens.
 Medoid self-consistency is not worth its price at any scale we measured.
 
 \paragraph{Why medoid self-consistency fails here, stated as a claim others can use.}
